@@ -54,7 +54,7 @@ void ofApp::setup(){
 void ofApp::updateSound() {
   if (!isDecimatorMode) {
     // If I'm in speed mode, update the speed of the track.
-    float newSpeed = ofMap(avgBrightness, 150, 165, 1.0f, 0.3f, true);
+    float newSpeed = ofMap(avgBrightness, 10, 150, 1.0f, 0.3f, true);
     
     // Current track's speed.
     if (currentTrack != NULL) {
@@ -66,7 +66,7 @@ void ofApp::updateSound() {
     noise * dB(-150.0f) >> engine.audio_out(1);
   } else {
     // Calculate the new decimator frequency based on the brightness.
-    float newDecimatorFrequency = ofMap(avgBrightness, 150, 156, 30000, 1000, true);
+    float newDecimatorFrequency = ofMap(avgBrightness, 10, 100, 20000, 1000, true);
     
     // Feed it to the decimator patch.
     newDecimatorFrequency >> decimator.in_freq();
@@ -74,11 +74,11 @@ void ofApp::updateSound() {
     // Noise control. We will keep default pitch.
     
     // Modify noise bit.
-    float noiseBit = ofMap(avgBrightness, 150, 165, 1, 12, true);
+    float noiseBit = ofMap(avgBrightness, 10, 100, 1, 12, true);
     noiseBit >> noise.in_bits();
     
     // Modify gain.
-    noiseGain = ofMap(avgBrightness, 150, 165, -40.0f, -10.0f, true);
+    noiseGain = ofMap(avgBrightness, 10, 100, -60.0f, -10.0f, true);
     
     noise * dB(noiseGain) >> engine.audio_out(0);
     noise * dB(noiseGain) >> engine.audio_out(1);
@@ -136,11 +136,11 @@ void ofApp::playWithPDSP(int val, int trackNum) {
   
   switch (trackNum) {
       case 1:
-        sample.load("/Users/amaykataria/Documents/of_v0.9.8_osx_release/apps/Experiments/KinectInteractiveSound/bin/data/howtostillmind.mp3");
+        sample.load("/Users/amaykataria/Documents/of_v0.9.8_osx_release/apps/Silo/KinectInteractiveSound/bin/data/howtostillmind.mp3");
         break;
       
       case 2:
-        sample.load("/Users/amaykataria/Documents/of_v0.9.8_osx_release/apps/Experiments/KinectInteractiveSound/bin/data/metronome.mp3");
+        sample.load(" /Users/amaykataria/Documents/of_v0.9.8_osx_release/apps/Silo/KinectInteractiveSound/bin/data/metronome.mp3");
         break;
       
       default:
@@ -157,10 +157,8 @@ void ofApp::playWithPDSP(int val, int trackNum) {
 
 //--------------------------------------------------------------
 void ofApp::update(){
-  int sumX = 0;
-  int sumY = 0;
-  int numPixels = 0;
   int sumBrightness = 0;
+  int numBrightPixels = 0;
   
   // Kinect updates
   if (kinect != NULL){
@@ -178,23 +176,20 @@ void ofApp::update(){
       for (int x = 0; x < width; x += pixelSkip) {
         for (int y = 0; y < height; y += pixelSkip) {
           int pixelIndex = x + y * width;
-          // Check if the brightness of this pixel is greater than my
-          // minimum brightness.
+          // Every pixel value is the brightness in a depth texture.
           int pixelVal = (int) pixels[pixelIndex];
-          if (pixelVal > 100) {
-            sumX += x;
-            sumY += y;
-            sumBrightness += pixels[pixelIndex];
-            numPixels++;
+          if (pixelVal > 0) {
+            numBrightPixels++;
+            sumBrightness += pixelVal;
           }
         }
       }
       
-      if (numPixels != 0) {
-        // Calculate average pixel values.
-        avgX = sumX / numPixels;
-        avgY = sumY / numPixels;
-        avgBrightness = sumBrightness / numPixels;
+      // Potential to update sound if something got visible in the range of the
+      // Kinect.
+      if (sumBrightness > 0) {
+        // Average brightness of the image.
+        avgBrightness = sumBrightness / numBrightPixels;
         // Update the sound.
         updateSound();
       }
@@ -240,15 +235,8 @@ void ofApp::draw(){
   // Depth texture at 10,10.
   depthTexture.draw(0, 0);
   
-  ofPushStyle();
-  
-    // Draw a small circle at (avgX, avgY)
-    //ofSetColor(ofColor::purple);
-    //ofFill();
-    //ofDrawCircle(avgX, avgY, 20);
-    ofDrawBitmapString(avgBrightness, ofGetWidth()/2 + 20, ofGetHeight()/2 + 20);
-  
-  ofPopStyle();
+  // Write the average brightness on the screen.
+  ofDrawBitmapString(avgBrightness, 300, 300);
   
   // Threshold panel.
   panel.draw();
