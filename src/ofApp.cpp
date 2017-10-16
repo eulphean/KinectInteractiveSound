@@ -54,7 +54,7 @@ void ofApp::setup(){
 void ofApp::updateSound() {
   if (!isDecimatorMode) {
     // If I'm in speed mode, update the speed of the track.
-    float newSpeed = ofMap(avgBrightness, 10, 150, 1.0f, 0.3f, true);
+    float newSpeed = ofMap(avgBrightness, 10, 150, 1.0f, 0.5f, true);
     
     // Current track's speed.
     if (currentTrack != NULL) {
