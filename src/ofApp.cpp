@@ -66,7 +66,7 @@ void ofApp::updateSound() {
     noise * dB(-150.0f) >> engine.audio_out(1);
   } else {
     // Calculate the new decimator frequency based on the brightness.
-    float newDecimatorFrequency = ofMap(avgBrightness, 10, 100, 20000, 1000, true);
+    float newDecimatorFrequency = ofMap(avgBrightness, 70, 80, 20000, 1000, true);
     
     // Feed it to the decimator patch.
     newDecimatorFrequency >> decimator.in_freq();
@@ -74,11 +74,11 @@ void ofApp::updateSound() {
     // Noise control. We will keep default pitch.
     
     // Modify noise bit.
-    float noiseBit = ofMap(avgBrightness, 10, 100, 1, 12, true);
+    float noiseBit = ofMap(avgBrightness, 70, 80, 1, 12, true);
     noiseBit >> noise.in_bits();
     
     // Modify gain.
-    noiseGain = ofMap(avgBrightness, 10, 100, -60.0f, -10.0f, true);
+    noiseGain = ofMap(avgBrightness, 70, 80, -60.0f, -10.0f, true);
     
     noise * dB(noiseGain) >> engine.audio_out(0);
     noise * dB(noiseGain) >> engine.audio_out(1);
@@ -136,11 +136,11 @@ void ofApp::playWithPDSP(int val, int trackNum) {
   
   switch (trackNum) {
       case 1:
-        sample.load("/Users/amaykataria/Documents/of_v0.9.8_osx_release/apps/Silo/KinectInteractiveSound/bin/data/howtostillmind.mp3");
+        sample.load("/Users/amay/Documents/of_v20170714_osx_release/apps/myApps/sensationperception/bin/data/howtostillmind.mp3");
         break;
       
       case 2:
-        sample.load(" /Users/amaykataria/Documents/of_v0.9.8_osx_release/apps/Silo/KinectInteractiveSound/bin/data/metronome.mp3");
+        sample.load("/Users/amay/Documents/of_v20170714_osx_release/apps/myApps/sensationperception/bin/data/metronome.mp3");
         break;
       
       default:
