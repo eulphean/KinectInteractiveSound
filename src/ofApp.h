@@ -1,6 +1,7 @@
 #pragma once
 
 #include "ofMain.h"
+#include "AudioPlayer.h"
 #include "ofxKinectV2.h"
 #include "ofxGui.h"
 #include "ofxOsc.h"
@@ -30,42 +31,19 @@ class ofApp : public ofBaseApp{
     float avgY;
     float avgBrightness;
   
-  
     // Touch OSC parameters.
-    void setCurrentTrackAndPlay(int val, ofSoundPlayer * newCurrentTrack);
+    //void setCurrentTrackAndPlay(int val, ofSoundPlayer * newCurrentTrack);
     ofxOscReceiver receive;
     ofVec2f mappedOsc;
-    ofSoundPlayer *currentTrack = NULL;
-  
-    ofSoundPlayer track1;
-    ofSoundPlayer track2;
-    ofSoundPlayer track3;
-  
-    // PDSP parameters.
-    ofxPDSPEngine   engine;
-    
-    pdsp::Sampler       sampler0;
-    pdsp::Sampler       sampler1;
-    pdsp::Amp           amp0;
-    pdsp::Amp           amp1;
-    
-    pdsp::SampleBuffer  sample;
-    pdsp::ADSR          env;
-    
-    ofxPDSPTrigger envGate;
-    ofxPDSPTrigger sampleTrig;
-    
-    pdsp::Decimator     decimator;
-  
-    pdsp::BitNoise    noise;
-  
-  float noiseGain;
   
     // Method to play the track with PDSP add on.
-    void playWithPDSP(int val, int trackNum);
+    //void playWithPDSP(int val, int trackNum);
   
-    // Speed or decimator mode.
-    bool isDecimatorMode = false;
+    void keyPressed(int key);
   
-    bool isPlaying = false;
+    AudioPlayer audioPlayer;
+  
+    ofxPanel gui;
+    ofxFloatSlider brightness;
 };
+

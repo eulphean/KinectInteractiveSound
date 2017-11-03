@@ -20,140 +20,18 @@ void ofApp::setup(){
     panel.add(kinect->params);
   }
   
-  // Load track1.
-  track1.load("howtostillmind.mp3");
-  track1.setVolume(0.75f);
-  track1.setLoop(true);
-  
-  // Load track2.
-  track2.load("metronome.mp3");
-  track2.setVolume(0.75f);
-  track2.setLoop(true);
-  
   panel.loadFromFile("settings.xml");
   
-  //--------PATCHING-------
-  // Sample 0, 1 are taking the sample buffer.
-  sampler0.addSample( &sample, 0 );
-  sampler1.addSample( &sample, 1 );
-
-  // ADSR Trigger - Without this the sample wouldn't play.
-  envGate >> env >> amp0.in_mod();
-  env >> amp1.in_mod();
+  // Add samples to the Audio Player to sequence through.
+  audioPlayer.addSample("/Users/amaykataria/Documents/of_v20170714_osx_release/apps/Silo/KinectInteractiveSound/bin/data/1.wav");
+  audioPlayer.addSample("/Users/amaykataria/Documents/of_v20170714_osx_release/apps/Silo/KinectInteractiveSound/bin/data/2.wav");
+  audioPlayer.addSample("/Users/amaykataria/Documents/of_v20170714_osx_release/apps/Silo/KinectInteractiveSound/bin/data/3.wav");
+  audioPlayer.addSample("/Users/amaykataria/Documents/of_v20170714_osx_release/apps/Silo/KinectInteractiveSound/bin/data/4.wav");
   
-  // Setup the trigger to the sampler to the audio output. 
-  sampleTrig >> sampler0 >> amp0 >> decimator >> engine.audio_out(0);
-  sampleTrig >> sampler1 >> amp1 >> decimator >> engine.audio_out(1);
-
-  //------------SETUPS AND START AUDIO-------------
-  engine.listDevices();
-  engine.setDeviceID(1); // REMEMBER TO SET THIS AT THE RIGHT INDEX!!!!
-  engine.setup( 44100, 512, 3);
+  gui.setup();
+  gui.add(brightness.setup("brightness", 80, 70, 100));
+  gui.setPosition(10, 10);
 }
-
-void ofApp::updateSound() {
-  if (!isDecimatorMode) {
-    // If I'm in speed mode, update the speed of the track.
-    float newSpeed = ofMap(avgBrightness, 10, 150, 1.0f, 0.5f, true);
-    
-    // Current track's speed.
-    if (currentTrack != NULL) {
-      currentTrack -> setSpeed(newSpeed);
-    }
-    
-    // Reset noise
-    noise * dB(-150.0f) >> engine.audio_out(0);
-    noise * dB(-150.0f) >> engine.audio_out(1);
-  } else {
-    // Calculate the new decimator frequency based on the brightness.
-    float newDecimatorFrequency = ofMap(avgBrightness, 70, 80, 20000, 1000, true);
-    
-    // Feed it to the decimator patch.
-    newDecimatorFrequency >> decimator.in_freq();
-    
-    // Noise control. We will keep default pitch.
-    
-    // Modify noise bit.
-    float noiseBit = ofMap(avgBrightness, 70, 80, 1, 12, true);
-    noiseBit >> noise.in_bits();
-    
-    // Modify gain.
-    noiseGain = ofMap(avgBrightness, 70, 80, -60.0f, -10.0f, true);
-    
-    noise * dB(noiseGain) >> engine.audio_out(0);
-    noise * dB(noiseGain) >> engine.audio_out(1);
-  }
-}
-
-void ofApp::setCurrentTrackAndPlay(int val, ofSoundPlayer * newCurrentTrack) {
-  isDecimatorMode = false;
-  
-  if (isPlaying) {
-    envGate.off();
-    isPlaying = false;
-  }
-  
-  if (val) {
-    // Check if there is alread a currentTrack that's playing.
-    // Stop that track.
-    if (currentTrack != NULL) {
-      currentTrack -> stop();
-      currentTrack = NULL;
-    }
-    
-    currentTrack = newCurrentTrack;
-    currentTrack -> play();
-  } else {
-    
-    // Stop the track if there is a valid current track.
-    if (currentTrack != NULL) {
-      currentTrack -> stop();
-      currentTrack = NULL;
-    }
-  }
-}
-
-void ofApp::playWithPDSP(int val, int trackNum) {
-  if (val == 0) {
-    isPlaying = false;
-    envGate.off();
-    return;
-  }
-  
-  isDecimatorMode = true;
-  
-  if (currentTrack != NULL) {
-      currentTrack -> stop();
-      currentTrack = NULL;
-  }
-  
-  // Check if a track is already being played with sampleBuffer. Stop that
-  // before loading and playing another track.
-  
-  if (isPlaying) {
-      envGate.off();
-  }
-  
-  switch (trackNum) {
-      case 1:
-        sample.load("/Users/amay/Documents/of_v20170714_osx_release/apps/myApps/sensationperception/bin/data/howtostillmind.mp3");
-        break;
-      
-      case 2:
-        sample.load("/Users/amay/Documents/of_v20170714_osx_release/apps/myApps/sensationperception/bin/data/metronome.mp3");
-        break;
-      
-      default:
-        break;
-  }
-
-  
-  // Trigger the sample and let it go.
-  sampleTrig.trigger(1.0f);
-  envGate.trigger(1.0f);
-  isPlaying = true;
-}
-
 
 //--------------------------------------------------------------
 void ofApp::update(){
@@ -190,12 +68,16 @@ void ofApp::update(){
       if (sumBrightness > 0) {
         // Average brightness of the image.
         avgBrightness = sumBrightness / numBrightPixels;
-        // Update the sound.
-        updateSound();
+        
+        // Update sound.
+        audioPlayer.updateSound(avgBrightness);
       }
     }
   }
   
+  // TODO: Enable this, when GUI is used.
+  //audioPlayer.updateSound(brightness);
+
   // Touch OSC updates.
   while (receive.hasWaitingMessages()) {
     ofxOscMessage m;
@@ -203,31 +85,46 @@ void ofApp::update(){
     #pragma warning(disable: WARNING_CODE)
     receive.getNextMessage(&m);
     
-    // Pause/play Track1.
     if (m.getAddress() == "/3/toggle1") {
       int val = m.getArgAsInt(0);
-      setCurrentTrackAndPlay(val, &track1);
+      if (val) {
+        audioPlayer.play();
+      }
     }
     
-    // Pause/play Track2.
     if (m.getAddress() == "/3/toggle2") {
       int val = m.getArgAsInt(0);
-      setCurrentTrackAndPlay(val, &track2);
+      if (val) {
+        audioPlayer.pause();
+      }
     }
     
-    // Play Track1 with decimation mode.
     if (m.getAddress() == "/3/toggle3") {
       int val = m.getArgAsInt(0);
-      playWithPDSP(val, 1);
+      if (val) {
+        audioPlayer.stop();
+      }
     }
     
-    // Play Track2 with decimation mode.
     if (m.getAddress() == "/3/toggle4") {
       int val = m.getArgAsInt(0);
-      playWithPDSP(val, 2);
+      audioPlayer.setPitchMode(val);
+    }
+    
+    if (m.getAddress() == "/3/xy") {
+      float oscX = m.getArgAsFloat(0);
+      float oscY = m.getArgAsFloat(1);
       
+      mappedOsc.x = ofMap(oscX, 0, 1, 0.0f, 1.0f);
+      audioPlayer.setSeekPosition(mappedOsc.x);
+      
+      mappedOsc.y = ofMap(oscY, 0, 1, 0.0f, 15.0f);
+      audioPlayer.setGain(mappedOsc.y);
     }
   }
+  
+  // Update Audio player.
+  audioPlayer.update();
 }
 
 //--------------------------------------------------------------
@@ -240,4 +137,26 @@ void ofApp::draw(){
   
   // Threshold panel.
   panel.draw();
+  gui.draw();
+  
+  //audioPlayer.drawGui();
+}
+
+void ofApp::keyPressed(int key) {
+  if (key == 49) {
+    audioPlayer.play();
+  }
+  
+  if (key == 50) {
+    audioPlayer.pause();
+  }
+  
+  if (key == 51) {
+    audioPlayer.stop();
+  }
+  
+  if (key == 52) {
+    bool pitchMode = audioPlayer.getPitchMode();
+    audioPlayer.setPitchMode(!pitchMode);
+  }
 }
