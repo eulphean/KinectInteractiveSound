@@ -52,7 +52,7 @@ private:
   
     // Update sound constants.
     const int minBrightness = 80;
-    const int maxBrightness = 90;
+    const int maxBrightness = 95;
   
     // PDSP parameters.
     ofxPDSPEngine engine;
