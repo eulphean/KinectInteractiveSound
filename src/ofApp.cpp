@@ -23,10 +23,10 @@ void ofApp::setup(){
   panel.loadFromFile("settings.xml");
   
   // Add samples to the Audio Player to sequence through.
-  audioPlayer.addSample("/Users/amaykataria/Documents/of_v20170714_osx_release/apps/Silo/KinectInteractiveSound/bin/data/1.wav");
-  audioPlayer.addSample("/Users/amaykataria/Documents/of_v20170714_osx_release/apps/Silo/KinectInteractiveSound/bin/data/2.wav");
-  audioPlayer.addSample("/Users/amaykataria/Documents/of_v20170714_osx_release/apps/Silo/KinectInteractiveSound/bin/data/3.wav");
-  audioPlayer.addSample("/Users/amaykataria/Documents/of_v20170714_osx_release/apps/Silo/KinectInteractiveSound/bin/data/4.wav");
+  audioPlayer.addSample("/Users/amay/Documents/of_v20170714_osx_release/apps/myApps/KinectInteractiveSound/bin/data/1.wav");
+  audioPlayer.addSample("/Users/amay/Documents/of_v20170714_osx_release/apps/myApps/KinectInteractiveSound/bin/data/2.wav");
+  audioPlayer.addSample("/Users/amay/Documents/of_v20170714_osx_release/apps/myApps/KinectInteractiveSound/bin/data/3.wav");
+  audioPlayer.addSample("/Users/amay/Documents/of_v20170714_osx_release/apps/myApps/KinectInteractiveSound/bin/data/4.wav");
   
   gui.setup();
   gui.add(brightness.setup("brightness", 80, 70, 100));
@@ -115,10 +115,10 @@ void ofApp::update(){
       float oscX = m.getArgAsFloat(0);
       float oscY = m.getArgAsFloat(1);
       
-      mappedOsc.x = ofMap(oscX, 0, 1, 0.0f, 1.0f);
-      audioPlayer.setSeekPosition(mappedOsc.x);
+      /*mappedOsc.x = ofMap(oscX, 0, 1, 0.1f, 0.9f);
+      audioPlayer.setSeekPosition(mappedOsc.x);*/
       
-      mappedOsc.y = ofMap(oscY, 0, 1, 0.0f, 15.0f);
+      mappedOsc.y = ofMap(oscY, 0, 1, -20.0f, 30.0f);
       audioPlayer.setGain(mappedOsc.y);
     }
   }

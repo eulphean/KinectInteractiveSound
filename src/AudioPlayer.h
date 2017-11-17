@@ -51,8 +51,8 @@ private:
     bool pitchMode;
   
     // Update sound constants.
-    const int minBrightness = 80;
-    const int maxBrightness = 95;
+    const int minBrightness = 75;
+    const int maxBrightness = 85;
   
     // PDSP parameters.
     ofxPDSPEngine engine;

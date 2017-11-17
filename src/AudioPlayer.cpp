@@ -42,7 +42,7 @@ void AudioPlayer::patch() {
 
     //------------SETUPS AND START AUDIO-------------
     engine.listDevices();
-    engine.setDeviceID(1); // REMEMBER TO SET THIS AT THE RIGHT INDEX!!!!
+    engine.setDeviceID(0); // REMEMBER TO SET THIS AT THE RIGHT INDEX!!!!
     engine.setup(44100, 512, 2);
 }
 
@@ -53,21 +53,24 @@ void AudioPlayer::update() {
     sampleState = stopped;
   
     // Select the next sample. 
-    sampleIdx = (sampleIdx + 1);
+    /*sampleIdx = (sampleIdx + 1);
     sampleIdx = sampleIdx % samples.size();
     sampleIdx >> sampler.in_select();
+      cout << sampleIdx << endl;*/
+      // Repeat the first track only.
+      0.0f >> sampler.in_select();
     
     // Play the sample.
     play();
   }
   
   // Check if it's time to switch into pitch mode. Let's do it after 30 seconds right now for testing sake.
-  if (ofGetElapsedTimeMillis() > 600000) { // 10 minutes
+  if (ofGetElapsedTimeMillis() > 10000 && !pitchMode) { // 1 minute
     pitchMode = !pitchMode;
     ofResetElapsedTimeCounter();
   }
   
-  if (ofGetElapsedTimeMillis() > 120000 && pitchMode) { // 2 minutes
+  if (ofGetElapsedTimeMillis() > 20000 && pitchMode) { // 1 minutes
     pitchMode = !pitchMode;
     ofResetElapsedTimeCounter();
   }
@@ -78,8 +81,9 @@ void AudioPlayer::updateSound(float avgBrightness) {
       // Reset any decimation.
       20000 >> decimator.in_freq();
       1 >> noise.in_bits();
+      killAmbientNoise();
       
-      float newPitch = ofMap(avgBrightness, minBrightness, maxBrightness, 0.0f, 10.0f, true);
+      float newPitch = ofMap(avgBrightness, minBrightness, maxBrightness, -10.0f, 5.0f, true);
       newPitch >> sampler.in_pitch();
       
     } else {
@@ -87,7 +91,7 @@ void AudioPlayer::updateSound(float avgBrightness) {
       0.0f >> sampler.in_pitch();
       
       // Calculate the new decimator frequency based on the brightness.
-      float newDecimatorFrequency = ofMap(avgBrightness, minBrightness, maxBrightness, 20000, 500, true);
+      float newDecimatorFrequency = ofMap(avgBrightness, minBrightness, maxBrightness, 10000, 500, true);
       
       // Feed it to the decimator patch.
       newDecimatorFrequency >> decimator.in_freq();
@@ -97,12 +101,13 @@ void AudioPlayer::updateSound(float avgBrightness) {
       noiseBit >> noise.in_bits();
     }
   
-    if (sampleState == playing) {
+    if (sampleState == playing && !pitchMode) {
       float noiseGain;
       // Modify noise gain.
-      noiseGain = ofMap(avgBrightness, minBrightness, maxBrightness, -80.0f, -20.0f, true);
+      noiseGain = ofMap(avgBrightness, minBrightness, maxBrightness, -45.0f, 10.0f, true);
       noise * dB(noiseGain) >> engine.audio_out(0);
       noise * dB(noiseGain) >> engine.audio_out(1);
+    //  noise * dB(noiseGain) >> amp;
     }
 }
 
@@ -125,6 +130,7 @@ void AudioPlayer::play() {
   if (sampleState == paused){
     envGate.trigger(1.0f);
   } else if (sampleState == stopped) {
+    //setSeekPosition(0.0f);
     envGate.trigger(1.0f);
     sampleTrig.trigger(1.0f);
   }
@@ -150,6 +156,8 @@ void AudioPlayer::stop(){
 
 void AudioPlayer::setGain(float dbVal) {
   sampler * dB(dbVal) >> amp;
+  //noise * dB(dbVal/2) >> engine.audio_out(0);
+  //noise * dB(dbVal/2) >> engine.audio_out(1);
 }
 
 void AudioPlayer::setPitchMode(bool enablePitchMode) {
