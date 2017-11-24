@@ -45,6 +45,7 @@ class ofApp : public ofBaseApp{
     // Kinect parameters.
     ofxKinectV2 * kinect;
     ofTexture texDepth;
+    ofPixels depthPixels;
   
     float avgX;
     float avgY;
@@ -66,6 +67,8 @@ class ofApp : public ofBaseApp{
     // Contour Finder.
     ofxCv::ContourFinder contourFinder;
     ofxCv::RectTrackerFollower<Glow> tracker;
+  
+    ofEasyCam cam;
   
     #ifdef _USE_VIDEO
   

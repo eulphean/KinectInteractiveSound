@@ -133,7 +133,7 @@ void ofApp::update(){
     // Video player related updates.
     if (currentVidPlayer -> isFrameNew()) {
       blur((*currentVidPlayer), 10);
-      ofPixels depthPixels = currentVidPlayer -> getPixels();
+      depthPixels = currentVidPlayer -> getPixels();
       texDepth.loadData(depthPixels);
       depthImgMat = ofxCv::toCv(depthPixels);
       
@@ -171,7 +171,6 @@ void ofApp::update(){
   // Handle touch OSC messages. 
   processOSCMessages();
   
-  
   // Update Audio player.
   audioPlayer.update();
   
@@ -181,15 +180,27 @@ void ofApp::update(){
 
 //--------------------------------------------------------------
 void ofApp::draw(){
-  // Draw the depth texture.
-  texDepth.draw(0, 0);
-  gui.draw();
-  //contourFinder.draw();
-  vector<Glow>& followers = tracker.getFollowers();
-	for(int i = 0; i < followers.size(); i++) {
-		followers[i].draw();
-	}
-  //audioPlayer.drawGui();
+    // Draw the depth texture.
+    //texDepth.draw(0, 0);
+    gui.draw();
+    contourFinder.draw();
+    vector<Glow>& followers = tracker.getFollowers();
+    for(int i = 0; i < followers.size(); i++) {
+     followers[i].draw();
+    }
+    vector<cv::Rect> rectangles = contourFinder.getBoundingRects();
+    for (int i = 0; i < rectangles.size(); i++) {
+      ofVec2f center = toOf(rectangles[i]).getCenter();
+      int pixelIndex = center.x + center.y * depthPixels.getWidth();
+      // Every pixel value is the brightness in a depth texture.
+      int pixelVal = (int) depthPixels[pixelIndex];
+      ofPushMatrix();
+        ofTranslate(center.x, center.y, pixelVal);
+        ofDrawAxis(10);
+      ofPopMatrix();
+      //ofDrawBox(center.x, center.y, pixelVal, 50);
+    }
+    //audioPlayer.drawGui();
 }
 
 void ofApp::keyPressed(int key) {
