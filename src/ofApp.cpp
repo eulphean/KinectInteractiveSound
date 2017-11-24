@@ -24,9 +24,6 @@ void ofApp::setup(){
   
   // Add samples to the Audio Player to sequence through.
   audioPlayer.addSample("/Users/amay/Documents/of_v20170714_osx_release/apps/myApps/KinectInteractiveSound/bin/data/1.wav");
-  audioPlayer.addSample("/Users/amay/Documents/of_v20170714_osx_release/apps/myApps/KinectInteractiveSound/bin/data/2.wav");
-  audioPlayer.addSample("/Users/amay/Documents/of_v20170714_osx_release/apps/myApps/KinectInteractiveSound/bin/data/3.wav");
-  audioPlayer.addSample("/Users/amay/Documents/of_v20170714_osx_release/apps/myApps/KinectInteractiveSound/bin/data/4.wav");
   
   gui.setup();
   gui.add(brightness.setup("brightness", 80, 70, 100));

@@ -18,6 +18,7 @@ class ofApp : public ofBaseApp{
 		void setup();
 		void update();
 		void draw();
+    void keyPressed(int key);
   
     // Sound methods. 
     void updateSound();
@@ -32,15 +33,10 @@ class ofApp : public ofBaseApp{
     float avgBrightness;
   
     // Touch OSC parameters.
-    //void setCurrentTrackAndPlay(int val, ofSoundPlayer * newCurrentTrack);
     ofxOscReceiver receive;
     ofVec2f mappedOsc;
   
-    // Method to play the track with PDSP add on.
-    //void playWithPDSP(int val, int trackNum);
-  
-    void keyPressed(int key);
-  
+    // Audio player responsible to play the sample.
     AudioPlayer audioPlayer;
   
     ofxPanel gui;

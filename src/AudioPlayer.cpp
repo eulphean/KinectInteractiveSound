@@ -52,13 +52,8 @@ void AudioPlayer::update() {
     // Audio is done playing.
     sampleState = stopped;
   
-    // Select the next sample. 
-    /*sampleIdx = (sampleIdx + 1);
-    sampleIdx = sampleIdx % samples.size();
-    sampleIdx >> sampler.in_select();
-      cout << sampleIdx << endl;*/
-      // Repeat the first track only.
-      0.0f >> sampler.in_select();
+    // Repeat the first track only.
+    0.0f >> sampler.in_select();
     
     // Play the sample.
     play();
