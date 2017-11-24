@@ -6,8 +6,12 @@
 #include "ofxGui.h"
 #include "ofxOsc.h"
 #include "ofxPDSP.h"
+#include "ofxCv.h"
 
 #define PORT 8000
+
+// Uncoment this if you don't want to use the test bench. 
+#define _USE_VIDEO
 
 class ofApp : public ofBaseApp{
 
@@ -19,14 +23,12 @@ class ofApp : public ofBaseApp{
 		void update();
 		void draw();
     void keyPressed(int key);
-  
-    // Sound methods. 
-    void updateSound();
+    void exit();
+    void processOSCMessages();
   
     // Kinect parameters.
-    ofxPanel panel;
     ofxKinectV2 * kinect;
-    ofTexture depthTexture;
+    ofTexture texDepth;
   
     float avgX;
     float avgY;
@@ -39,7 +41,24 @@ class ofApp : public ofBaseApp{
     // Audio player responsible to play the sample.
     AudioPlayer audioPlayer;
   
+    // GUI.
     ofxPanel gui;
-    ofxFloatSlider brightness;
+    ofxGuiGroup kinectGroup;
+    ofxGuiGroup cvGroup;
+    ofxFloatSlider minArea, maxArea, threshold;
+  
+    // Contour Finder.
+    ofxCv::ContourFinder contourFinder;
+  
+    #ifdef _USE_VIDEO
+  
+      ofVideoPlayer vidPlayer1;
+      ofVideoPlayer vidPlayer2;
+      ofVideoPlayer vidPlayer3;
+      ofVideoPlayer vidPlayer4;
+  
+      ofVideoPlayer *currentVidPlayer;
+  
+    #endif
 };
 

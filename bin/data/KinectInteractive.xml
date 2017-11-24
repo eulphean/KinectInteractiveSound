@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<group>
+	<ofxCv>
+		<Min_area>10</Min_area>
+		<Max_area>200</Max_area>
+		<Threshold>128</Threshold>
+	</ofxCv>
+</group>

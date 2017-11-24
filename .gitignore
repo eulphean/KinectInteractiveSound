@@ -19,6 +19,7 @@ tgnore generated binaries
 *.pyc
 .svn/
 *.log
+*.mov
 
 ########################
 # IDE files which should
@@ -35,6 +36,7 @@ tgnore generated binaries
 xcuserdata
 *.xcworkspace
 *.xcuserstate
+project.pbxproj
 
 # Code::Blocks
 *.depend
