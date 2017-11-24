@@ -11,6 +11,7 @@ void Glow::setup(const cv::Rect& track) {
 	color.setHsb(ofRandom(0, 255), 255, 255);
 	cur = toOf(track).getCenter();
 	smooth = cur;
+  brightness = smooth;
 }
 
 void Glow::update(const cv::Rect& track) {
@@ -100,9 +101,9 @@ void ofApp::setup(){
   cvGroup.add(threshold.setup("Threshold", 128, 0, 255));
   
   // wait for half a frame before forgetting something
-	tracker.setPersistence(15);
+	tracker.setPersistence(300);
 	// an object can move up to 50 pixels per frame
-	tracker.setMaximumDistance(200);
+	tracker.setMaximumDistance(400);
 
   // Add the groups to main GUI.
   gui.add(&cvGroup);
@@ -181,24 +182,17 @@ void ofApp::update(){
 //--------------------------------------------------------------
 void ofApp::draw(){
     // Draw the depth texture.
-    //texDepth.draw(0, 0);
+    texDepth.draw(0, 0);
     gui.draw();
-    contourFinder.draw();
+  
     vector<Glow>& followers = tracker.getFollowers();
+    cout << "Tracking - " << followers.size() << endl;
     for(int i = 0; i < followers.size(); i++) {
      followers[i].draw();
-    }
-    vector<cv::Rect> rectangles = contourFinder.getBoundingRects();
-    for (int i = 0; i < rectangles.size(); i++) {
-      ofVec2f center = toOf(rectangles[i]).getCenter();
-      int pixelIndex = center.x + center.y * depthPixels.getWidth();
-      // Every pixel value is the brightness in a depth texture.
-      int pixelVal = (int) depthPixels[pixelIndex];
-      ofPushMatrix();
-        ofTranslate(center.x, center.y, pixelVal);
-        ofDrawAxis(10);
-      ofPopMatrix();
-      //ofDrawBox(center.x, center.y, pixelVal, 50);
+     int pixelIndex = followers[i].brightness.x + followers[i].brightness.y * depthPixels.getWidth();
+     ofVec2f centerPos = followers[i].brightness;
+     int brightness = depthPixels.getColor(centerPos.x, centerPos.y).getBrightness();
+     ofDrawCircle(centerPos.x, centerPos.y, 10);
     }
     //audioPlayer.drawGui();
 }

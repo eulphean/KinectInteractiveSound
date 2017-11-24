@@ -20,6 +20,8 @@ protected:
 	float startedDying;
 	ofPolyline all;
 public:
+  ofVec2f brightness;
+  
 	Glow()
 		:startedDying(0) {
 	}
