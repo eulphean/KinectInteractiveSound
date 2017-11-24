@@ -142,7 +142,7 @@ void ofApp::update(){
 void ofApp::draw(){
     cam.begin();
     ofPushMatrix();
-    
+  
       ofScale(2, 2, 2);
       // Draw the depth texture.
       ofDrawAxis(20);
