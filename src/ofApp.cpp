@@ -2,8 +2,52 @@
 
 using namespace std;
 
+using namespace ofxCv;
+using namespace cv;
+
+const float dyingTime = 1;
+
+void Glow::setup(const cv::Rect& track) {
+	color.setHsb(ofRandom(0, 255), 255, 255);
+	cur = toOf(track).getCenter();
+	smooth = cur;
+}
+
+void Glow::update(const cv::Rect& track) {
+	cur = toOf(track).getCenter();
+	smooth.interpolate(cur, .5);
+	all.addVertex(smooth.x, smooth.y);
+}
+
+void Glow::kill() {
+	float curTime = ofGetElapsedTimef();
+	if(startedDying == 0) {
+		startedDying = curTime;
+	} else if(curTime - startedDying > dyingTime) {
+		dead = true;
+	}
+}
+
+void Glow::draw() {
+	ofPushStyle();
+	float size = 16;
+	ofSetColor(255);
+	if(startedDying) {
+		ofSetColor(ofColor::red);
+		size = ofMap(ofGetElapsedTimef() - startedDying, 0, dyingTime, size, 0, true);
+	}
+	ofNoFill();
+	ofDrawCircle(cur, size);
+	ofSetColor(color);
+	all.draw();
+	ofSetColor(255);
+	ofDrawBitmapString(ofToString(label), cur);
+	ofPopStyle();
+}
+
 //--------------------------------------------------------------
 void ofApp::setup(){
+	ofSetVerticalSync(true);
   ofBackground(ofColor::black);
   receive.setup(PORT);
   
@@ -54,6 +98,11 @@ void ofApp::setup(){
   cvGroup.add(minArea.setup("Min area", 10, 1, 100));
   cvGroup.add(maxArea.setup("Max area", 200, 1, 500));
   cvGroup.add(threshold.setup("Threshold", 128, 0, 255));
+  
+  // wait for half a frame before forgetting something
+	tracker.setPersistence(15);
+	// an object can move up to 50 pixels per frame
+	tracker.setMaximumDistance(200);
 
   // Add the groups to main GUI.
   gui.add(&cvGroup);
@@ -83,6 +132,7 @@ void ofApp::update(){
   
     // Video player related updates.
     if (currentVidPlayer -> isFrameNew()) {
+      blur((*currentVidPlayer), 10);
       ofPixels depthPixels = currentVidPlayer -> getPixels();
       texDepth.loadData(depthPixels);
       depthImgMat = ofxCv::toCv(depthPixels);
@@ -93,6 +143,7 @@ void ofApp::update(){
       
       // Find contours.
       contourFinder.findContours(depthImgMat);
+      tracker.track(contourFinder.getBoundingRects());
       
       // This is to center the polyline. Let's see if I need this. I should setup
       // the video such that it takes the entire screen pretty much. Like full screen.
@@ -133,15 +184,11 @@ void ofApp::draw(){
   // Draw the depth texture.
   texDepth.draw(0, 0);
   gui.draw();
-  contourFinder.draw();
-  
-//  // Write the average brightness on the screen.
-//  ofDrawBitmapString(avgBrightness, 300, 300);
-//  
-//  // Threshold panel.
-//  panel.draw();
-//  gui.draw();
-//  
+  //contourFinder.draw();
+  vector<Glow>& followers = tracker.getFollowers();
+	for(int i = 0; i < followers.size(); i++) {
+		followers[i].draw();
+	}
   //audioPlayer.drawGui();
 }
 

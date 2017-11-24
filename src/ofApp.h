@@ -13,6 +13,22 @@
 // Uncoment this if you don't want to use the test bench. 
 #define _USE_VIDEO
 
+class Glow : public ofxCv::RectFollower {
+protected:
+	ofColor color;
+	ofVec2f cur, smooth;
+	float startedDying;
+	ofPolyline all;
+public:
+	Glow()
+		:startedDying(0) {
+	}
+	void setup(const cv::Rect& track);
+	void update(const cv::Rect& track);
+	void kill();
+	void draw();
+};
+
 class ofApp : public ofBaseApp{
 
 	public:
@@ -49,6 +65,7 @@ class ofApp : public ofBaseApp{
   
     // Contour Finder.
     ofxCv::ContourFinder contourFinder;
+    ofxCv::RectTrackerFollower<Glow> tracker;
   
     #ifdef _USE_VIDEO
   
