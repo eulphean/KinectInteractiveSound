@@ -11,6 +11,7 @@ class TrackedRect : public ofxCv::RectFollower {
     ofPolyline all;
   public:
     ofVec2f center;
+    int brightness; 
     // Bounding rectangle that we are following.
     cv::Rect boundingRect;
   

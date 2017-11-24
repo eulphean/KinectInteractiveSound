@@ -140,28 +140,42 @@ void ofApp::update(){
 
 //--------------------------------------------------------------
 void ofApp::draw(){
-    // Draw the depth texture.
-    texDepth.draw(0, 0);
-    //gui.draw();
     cam.begin();
-    vector<TrackedRect>& followers = tracker.getFollowers();
-    for(int i = 0; i < followers.size(); i++) {
-     followers[i].draw();
-     
-     // Get the brightness in center.
-     ofVec2f center = followers[i].center;
-     
-     // Index of the center pixel of bounding rectangle.
-     int pixelIndex = center.x + center.y * depthPixels.getWidth();
-     int brightness = depthPixels.getColor(center.x, center.y).getBrightness();
-     int z = ofMap (brightness, 0, 255, 250, -250);
-     
-     ofRectangle rect = toOf(followers[i].boundingRect);
-     ofPushMatrix();
-       ofTranslate(center.x, center.y, z);
-       ofDrawBox(0, 0, 0, rect.width/2, rect.height/2, 20);
-     ofPopMatrix();
-    }
+    ofPushMatrix();
+    
+      ofScale(2, 2, 2);
+      // Draw the depth texture.
+      ofDrawAxis(20);
+      // texDepth.draw(0, 0);
+      // contourFinder.draw();
+      //gui.draw();
+      //vector<TrackedRect>& followers = tracker.getFollowers();
+      vector<cv::Rect> followers = contourFinder.getBoundingRects();
+      for(int i = 0; i < followers.size(); i++) {
+        ofRectangle boundingRect = toOf(followers[i]);
+       
+       // Get the brightness in center.
+       ofVec2f center = boundingRect.getCenter();
+       
+       // Index of the center pixel of bounding rectangle.
+       int pixelIndex = center.x + center.y * depthPixels.getWidth();
+       int brightness = depthPixels.getColor(center.x, center.y).getBrightness();
+       int z = ofMap (brightness, 255, 0, 300, -300, true);
+       
+       if (brightness > 0) {
+         ofPushMatrix();
+           ofTranslate(center.x, center.y, z);
+           ofPushStyle();
+            ofEnableAlphaBlending();
+            ofSetColor(ofColor::white, 127);
+            ofDrawBox(0, 0, 0, boundingRect.width, boundingRect.height, 15);
+            ofDisableAlphaBlending();
+           ofPopStyle();
+         ofPopMatrix();
+       }
+      }
+  
+    ofPopMatrix();
     cam.end();
     //audioPlayer.drawGui();
 }

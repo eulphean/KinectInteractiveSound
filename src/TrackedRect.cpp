@@ -45,6 +45,6 @@ void TrackedRect::draw() {
     ofSetColor(color);
     //all.draw();
     ofSetColor(255);
-    ofDrawBitmapString(ofToString(label), center);
+    //ofDrawBitmapString(ofToString(label), center);
 	ofPopStyle();
 }
