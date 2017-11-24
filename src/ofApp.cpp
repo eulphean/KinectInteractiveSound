@@ -5,47 +5,6 @@ using namespace std;
 using namespace ofxCv;
 using namespace cv;
 
-const float dyingTime = 1;
-
-void Glow::setup(const cv::Rect& track) {
-	color.setHsb(ofRandom(0, 255), 255, 255);
-	cur = toOf(track).getCenter();
-	smooth = cur;
-  brightness = smooth;
-}
-
-void Glow::update(const cv::Rect& track) {
-	cur = toOf(track).getCenter();
-	smooth.interpolate(cur, .5);
-	all.addVertex(smooth.x, smooth.y);
-}
-
-void Glow::kill() {
-	float curTime = ofGetElapsedTimef();
-	if(startedDying == 0) {
-		startedDying = curTime;
-	} else if(curTime - startedDying > dyingTime) {
-		dead = true;
-	}
-}
-
-void Glow::draw() {
-	ofPushStyle();
-	float size = 16;
-	ofSetColor(255);
-	if(startedDying) {
-		ofSetColor(ofColor::red);
-		size = ofMap(ofGetElapsedTimef() - startedDying, 0, dyingTime, size, 0, true);
-	}
-	ofNoFill();
-	ofDrawCircle(cur, size);
-	ofSetColor(color);
-	all.draw();
-	ofSetColor(255);
-	ofDrawBitmapString(ofToString(label), cur);
-	ofPopStyle();
-}
-
 //--------------------------------------------------------------
 void ofApp::setup(){
 	ofSetVerticalSync(true);
@@ -68,7 +27,7 @@ void ofApp::setup(){
   
     // Play the first test video.
     currentVidPlayer -> play();
-  
+
   #else 
   
     // Check if we have a Kinect device connected.
@@ -183,17 +142,27 @@ void ofApp::update(){
 void ofApp::draw(){
     // Draw the depth texture.
     texDepth.draw(0, 0);
-    gui.draw();
-  
-    vector<Glow>& followers = tracker.getFollowers();
-    cout << "Tracking - " << followers.size() << endl;
+    //gui.draw();
+    cam.begin();
+    vector<TrackedRect>& followers = tracker.getFollowers();
     for(int i = 0; i < followers.size(); i++) {
      followers[i].draw();
-     int pixelIndex = followers[i].brightness.x + followers[i].brightness.y * depthPixels.getWidth();
-     ofVec2f centerPos = followers[i].brightness;
-     int brightness = depthPixels.getColor(centerPos.x, centerPos.y).getBrightness();
-     ofDrawCircle(centerPos.x, centerPos.y, 10);
+     
+     // Get the brightness in center.
+     ofVec2f center = followers[i].center;
+     
+     // Index of the center pixel of bounding rectangle.
+     int pixelIndex = center.x + center.y * depthPixels.getWidth();
+     int brightness = depthPixels.getColor(center.x, center.y).getBrightness();
+     int z = ofMap (brightness, 0, 255, 250, -250);
+     
+     ofRectangle rect = toOf(followers[i].boundingRect);
+     ofPushMatrix();
+       ofTranslate(center.x, center.y, z);
+       ofDrawBox(0, 0, 0, rect.width/2, rect.height/2, 20);
+     ofPopMatrix();
     }
+    cam.end();
     //audioPlayer.drawGui();
 }
 

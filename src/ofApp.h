@@ -1,6 +1,7 @@
 #pragma once
 
 #include "ofMain.h"
+#include "TrackedRect.h"
 #include "AudioPlayer.h"
 #include "ofxKinectV2.h"
 #include "ofxGui.h"
@@ -12,24 +13,6 @@
 
 // Uncoment this if you don't want to use the test bench. 
 #define _USE_VIDEO
-
-class Glow : public ofxCv::RectFollower {
-protected:
-	ofColor color;
-	ofVec2f cur, smooth;
-	float startedDying;
-	ofPolyline all;
-public:
-  ofVec2f brightness;
-  
-	Glow()
-		:startedDying(0) {
-	}
-	void setup(const cv::Rect& track);
-	void update(const cv::Rect& track);
-	void kill();
-	void draw();
-};
 
 class ofApp : public ofBaseApp{
 
@@ -68,7 +51,7 @@ class ofApp : public ofBaseApp{
   
     // Contour Finder.
     ofxCv::ContourFinder contourFinder;
-    ofxCv::RectTrackerFollower<Glow> tracker;
+    ofxCv::RectTrackerFollower<TrackedRect> tracker;
   
     ofEasyCam cam;
   
@@ -82,5 +65,8 @@ class ofApp : public ofBaseApp{
       ofVideoPlayer *currentVidPlayer;
   
     #endif
+  
+    // Tracked objects
+    ofFbo following;
 };
 
