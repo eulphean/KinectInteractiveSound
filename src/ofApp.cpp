@@ -4,7 +4,7 @@ using namespace std;
 
 //--------------------------------------------------------------
 void ofApp::setup(){
-  ofBackground(30, 30, 30);
+  ofBackground(ofColor::black);
   receive.setup(PORT);
   
   // Load GUI from a pre-saved XML file.
@@ -132,6 +132,8 @@ void ofApp::update(){
 void ofApp::draw(){
   // Draw the depth texture.
   texDepth.draw(0, 0);
+  gui.draw();
+  contourFinder.draw();
   
 //  // Write the average brightness on the screen.
 //  ofDrawBitmapString(avgBrightness, 300, 300);
@@ -202,6 +204,15 @@ void ofApp::keyPressed(int key) {
       currentVidPlayer -> stop();
       currentVidPlayer = &vidPlayer3;
       currentVidPlayer -> play();
+    }
+  }
+  
+  // 9
+  if (key == 57) {
+    if (currentVidPlayer -> isPlaying()) {
+      currentVidPlayer -> setPaused(true);
+    } else {
+      currentVidPlayer -> setPaused(false);
     }
   }
 }
