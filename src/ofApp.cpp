@@ -59,10 +59,10 @@ void ofApp::setup(){
   cvGroup.add(maxArea.setup("Max area", 200, 1, 500));
   cvGroup.add(threshold.setup("Threshold", 128, 0, 255));
   
-  // wait for half a frame before forgetting something
-	tracker.setPersistence(300);
-	// an object can move up to 50 pixels per frame
-	tracker.setMaximumDistance(400);
+  // Tracker properties.
+  
+	tracker.setPersistence(120);
+	tracker.setMaximumDistance(300);
 
   // Add the groups to main GUI.
   gui.add(&cvGroup);
@@ -128,6 +128,10 @@ void ofApp::update(){
   
   #endif
   
+  // Update Z Distance of tracked objects based on the brightness
+  // of these objects.
+  updateZDistances();
+  
   // Handle touch OSC messages. 
   processOSCMessages();
   
@@ -138,46 +142,47 @@ void ofApp::update(){
   //audioPlayer.updateSound(brightness);
 }
 
+// Set Z distance for the Tracked objects.
+void ofApp::updateZDistances() {
+  vector <TrackedRect>& followers = tracker.getFollowers();
+  for (int i = 0; i < followers.size(); i++) {
+    int label = followers[i].getLabel();
+    
+    // Only update the Z distance if it's recently seen.
+    // Else, we won't update the Z distance.
+    if (tracker.getLastSeen(label) == 0) {
+      // Center of the bounding rectangle.
+      ofVec2f center = followers[i].getCenter();
+      
+      // Brightness of the pixel at center.
+      int pixelIndex = center.x + center.y * depthPixels.getWidth();
+      int brightness = depthPixels.getColor(center.x, center.y).getBrightness();
+      
+      // Map the distance in Z coordinate.
+      int z = ofMap (brightness, 255, 0, 300, -300, true);
+      followers[i].updateCenterWithZ(z);
+    }
+  }
+}
+
 //--------------------------------------------------------------
 void ofApp::draw(){
-    cam.begin();
-    ofPushMatrix();
+  cam.begin();
   
-      ofScale(2, 2, 2);
-      // Draw the depth texture.
-      ofDrawAxis(20);
-      // texDepth.draw(0, 0);
-      // contourFinder.draw();
-      //gui.draw();
-      //vector<TrackedRect>& followers = tracker.getFollowers();
-      vector<cv::Rect> followers = contourFinder.getBoundingRects();
-      for(int i = 0; i < followers.size(); i++) {
-        ofRectangle boundingRect = toOf(followers[i]);
-       
-       // Get the brightness in center.
-       ofVec2f center = boundingRect.getCenter();
-       
-       // Index of the center pixel of bounding rectangle.
-       int pixelIndex = center.x + center.y * depthPixels.getWidth();
-       int brightness = depthPixels.getColor(center.x, center.y).getBrightness();
-       int z = ofMap (brightness, 255, 0, 300, -300, true);
-       
-       if (brightness > 0) {
-         ofPushMatrix();
-           ofTranslate(center.x, center.y, z);
-           ofPushStyle();
-            ofEnableAlphaBlending();
-            ofSetColor(ofColor::white, 127);
-            ofDrawBox(0, 0, 0, boundingRect.width, boundingRect.height, 15);
-            ofDisableAlphaBlending();
-           ofPopStyle();
-         ofPopMatrix();
-       }
-      }
-  
-    ofPopMatrix();
-    cam.end();
-    //audioPlayer.drawGui();
+    ofScale(2, 2, 2);
+    
+    ofDrawAxis(10);
+    texDepth.draw(0, 0);
+    
+    //contourFinder.draw();
+    
+    // Get the followers and draw them.
+    vector<TrackedRect>& followers = tracker.getFollowers();
+    for (int i = 0; i < followers.size(); i++) {
+      followers[i].draw();
+    }
+    
+  cam.end();
 }
 
 void ofApp::keyPressed(int key) {
@@ -290,9 +295,6 @@ void ofApp::processOSCMessages() {
       float oscX = m.getArgAsFloat(0);
       float oscY = m.getArgAsFloat(1);
       
-      /*mappedOsc.x = ofMap(oscX, 0, 1, 0.1f, 0.9f);
-      audioPlayer.setSeekPosition(mappedOsc.x);*/
-      
       mappedOsc.y = ofMap(oscY, 0, 1, -20.0f, 30.0f);
       audioPlayer.setGain(mappedOsc.y);
     }
@@ -304,40 +306,41 @@ void ofApp::exit(){
 }
 
 /*
-
-    We will ditch this logic completely now. We don't care about 
-    somebody moving close to the Kinect and getting this average brightness. 
-    First we want to calculate the bounding box of the person moving around the
-    Kinect. Then we can probably use this logic. 
-    
-        
-    int sumBrightness = 0;
-    int numBrightPixels = 0;
- 
- 
-        int height = depthTexture.getHeight();
-        int width = depthTexture.getWidth();
-        
-        for (int x = 0; x < width; x += pixelSkip) {
-          for (int y = 0; y < height; y += pixelSkip) {
-            int pixelIndex = x + y * width;
-            // Every pixel value is the brightness in a depth texture.
-            int pixelVal = (int) pixels[pixelIndex];
-            if (pixelVal > 0) {
-              numBrightPixels++;
-              sumBrightness += pixelVal;
-            }
-          }
-        }
-        
-        // Potential to update sound if something got visible in the range of the
-        // Kinect.
-        if (sumBrightness > 0) {
-          // Average brightness of the image.
-          avgBrightness = sumBrightness / numBrightPixels;
-          
-          // Update sound.
-          audioPlayer.updateSound(avgBrightness);
-        }
-*/
-
+/ We want to see the tracker bubbles in 3d.
+    ofPushMatrix();
+      
+      ofScale(2, 2, 2);
+      ofDrawAxis(20);
+      texDepth.draw(0, 0);
+      contourFinder.draw();
+      gui.draw();
+      //vector<TrackedRect>& followers = tracker.getFollowers();
+      vector<cv::Rect> followers = contourFinder.getBoundingRects();
+      for(int i = 0; i < followers.size(); i++) {
+        ofRectangle boundingRect = toOf(followers[i]);
+       
+       // Get the brightness in center.
+       ofVec2f center = boundingRect.getCenter();
+       
+       // Index of the center pixel of bounding rectangle.
+       int pixelIndex = center.x + center.y * depthPixels.getWidth();
+       int brightness = depthPixels.getColor(center.x, center.y).getBrightness();
+       int z = ofMap (brightness, 255, 0, 300, -300, true);
+       
+       if (brightness > 0) {
+         ofPushMatrix();
+           ofTranslate(center.x, center.y, z);
+           ofPushStyle();
+            ofEnableAlphaBlending();
+            ofSetColor(ofColor::white, 127);
+            ofDrawBox(0, 0, 0, boundingRect.width, boundingRect.height, 15);
+            ofDisableAlphaBlending();
+           ofPopStyle();
+         ofPopMatrix();
+       }
+      }
+  
+    ofPopMatrix();
+    cam.end();
+    //audioPlayer.drawGui();
+    */

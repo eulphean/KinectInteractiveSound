@@ -9,16 +9,21 @@ const float dyingTime = 1;
 
 void TrackedRect::setup(const cv::Rect& track) {
 	color.setHsb(ofRandom(0, 255), 255, 255);
-	center = toOf(track).getCenter();
-  boundingRect = track;
+  
+  // Only get X and Y coordinate from bounded rectangle.
+	ofVec2f c = toOf(track).getCenter();
+  center.x = c.x; center.y = c.y;
+  
 	smooth = center;
 }
 
 void TrackedRect::update(const cv::Rect& track) {
-	center = toOf(track).getCenter();
-  boundingRect = track;
-	smooth.interpolate(center, .5);
-	all.addVertex(smooth.x, smooth.y);
+  // Only get X and Y coordinate from bounded rectangle.
+	ofVec2f c = toOf(track).getCenter();
+  center.x = c.x; center.y = c.y;
+  
+  smooth = glm::mix(glm::vec3(0, 0, 0), center, 0.5);
+	all.addVertex(smooth.x, smooth.y, smooth.z);
 }
 
 void TrackedRect::kill() {
@@ -28,6 +33,14 @@ void TrackedRect::kill() {
 	} else if(curTime - startedDying > dyingTime) {
 		dead = true;
 	}
+}
+
+void TrackedRect::updateCenterWithZ(int zDistance) {
+  center.z = zDistance;
+}
+
+glm::vec3 TrackedRect::getCenter() {
+  return center;
 }
 
 void TrackedRect::draw() {
@@ -41,10 +54,14 @@ void TrackedRect::draw() {
     }
   
     ofNoFill();
-    ofDrawCircle(center, size);
-    ofSetColor(color);
-    //all.draw();
-    ofSetColor(255);
-    //ofDrawBitmapString(ofToString(label), center);
+  
+    ofPushMatrix();
+      ofTranslate(center);
+      ofDrawSphere(0, 0, 0, size);
+      ofSetColor(color);
+      //all.draw();
+      ofSetColor(255);
+      //ofDrawBitmapString(ofToString(label), 0, 0, 0);
+    ofPopMatrix();
 	ofPopStyle();
 }

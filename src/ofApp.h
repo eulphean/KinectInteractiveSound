@@ -26,6 +26,7 @@ class ofApp : public ofBaseApp{
     void keyPressed(int key);
     void exit();
     void processOSCMessages();
+    void updateZDistances();
   
     // Kinect parameters.
     ofxKinectV2 * kinect;
