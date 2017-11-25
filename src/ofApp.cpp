@@ -178,9 +178,17 @@ void ofApp::draw(){
     
     // Get the followers and draw them.
     vector<TrackedRect>& followers = tracker.getFollowers();
-    for (int i = 0; i < followers.size(); i++) {
-      followers[i].draw();
-    }
+  
+    ofPushStyle();
+      ofPolyline p;
+      ofSetColor(ofColor::white);
+      for (int i = 0; i < followers.size(); i++) {
+        p.addVertex(followers[i].getCenter());
+        followers[i].draw();
+      }
+      p.close();
+      p.draw();
+    ofPopStyle();
     
   cam.end();
 }
