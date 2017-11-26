@@ -8,6 +8,8 @@ class TrackedRect : public ofxCv::RectFollower {
     ofColor color;
     glm::vec3 smooth;
     float startedDying;
+  
+    // Following trail. We are not using this currently. 
     ofPolyline all;
   
     // Center of the bounding box.

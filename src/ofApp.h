@@ -27,6 +27,7 @@ class ofApp : public ofBaseApp{
     void exit();
     void processOSCMessages();
     void updateZDistances();
+    void processTrackedObjects();
   
     // Kinect parameters.
     ofxKinectV2 * kinect;
@@ -48,7 +49,8 @@ class ofApp : public ofBaseApp{
     ofxPanel gui;
     ofxGuiGroup kinectGroup;
     ofxGuiGroup cvGroup;
-    ofxFloatSlider minArea, maxArea, threshold;
+    ofxGuiGroup trackerGroup;
+    ofxFloatSlider minArea, maxArea, threshold, persistence, maxDistance;
   
     // Contour Finder.
     ofxCv::ContourFinder contourFinder;
@@ -62,12 +64,13 @@ class ofApp : public ofBaseApp{
       ofVideoPlayer vidPlayer2;
       ofVideoPlayer vidPlayer3;
       ofVideoPlayer vidPlayer4;
+      ofVideoPlayer vidPlayer5;
   
       ofVideoPlayer *currentVidPlayer;
   
     #endif
   
-    // Tracked objects
-    ofFbo following;
+    // Tracked polyline.
+    ofPolyline trackedPoly;
 };
 

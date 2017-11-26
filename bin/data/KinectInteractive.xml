@@ -1,8 +1,17 @@
 <?xml version="1.0"?>
 <group>
 	<ofxCv>
-		<Min_area>39.8929</Min_area>
-		<Max_area>120</Max_area>
-		<Threshold>60</Threshold>
+		<Min_area>10.5969</Min_area>
+		<Max_area>110</Max_area>
+		<Threshold>14.3112</Threshold>
 	</ofxCv>
+	<Contour>
+		<Min_area>6.55612</Min_area>
+		<Max_area>120</Max_area>
+		<Threshold>11.7092</Threshold>
+	</Contour>
+	<Tracker>
+		<Persistence>120</Persistence>
+		<Max_Distance>273.98</Max_Distance>
+	</Tracker>
 </group>

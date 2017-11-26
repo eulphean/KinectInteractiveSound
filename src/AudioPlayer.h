@@ -5,18 +5,17 @@
 #include "ofxPDSP.h"
 #include  "ofxGui.h"
 
+enum State {
+  playing = 0,
+  paused,
+  stopped
+};
 
 class AudioPlayer : public pdsp::Patchable {
     
 public:
     AudioPlayer() { patch(); } 
     AudioPlayer( const AudioPlayer & other ) { patch(); }
-  
-    enum State {
-      playing = 0,
-      paused,
-      stopped
-    };
   
     // Check to see if it's time to move to the next sample.
     void update();
@@ -25,20 +24,15 @@ public:
     void addSample(string path);
   
     // Update sound effects based on human movement. 
-    void updateSound(float avgBrightness);
+    void updateSound(float perimeter);
   
     // Play, Pause, and Stop
     void play();
     void pause();
     void stop();
-  
-    void setPitchMode (bool isPitchMode);
-    bool getPitchMode ();
-  
-    void setSeekPosition (float seekPosition);
-    void setGain (float gain);
-  
+    void setSampleGain(float gain);
     void drawGui();
+    State getPlaybackState();
     
 private:
     // State of the system.
@@ -47,12 +41,9 @@ private:
     // Current sample
     int sampleIdx;
   
-    // Indicates if the pitch mode is on.
-    bool pitchMode;
-  
     // Update sound constants.
-    const int minBrightness = 75;
-    const int maxBrightness = 85;
+    const int minPerimeter = 200;
+    const int maxPerimeter = 1000;
   
     // PDSP parameters.
     ofxPDSPEngine engine;

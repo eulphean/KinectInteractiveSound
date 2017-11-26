@@ -21,6 +21,7 @@ void ofApp::setup(){
     vidPlayer2.load("2.mov");
     vidPlayer3.load("3.mov");
     vidPlayer4.load("4.mov");
+    vidPlayer5.load("5.mov");
   
     // Assign current video player to 1st video player.
     currentVidPlayer = &vidPlayer1;
@@ -54,18 +55,17 @@ void ofApp::setup(){
   #endif
   
   // openCv GUI.
-  cvGroup.setup("ofxCv");
+  cvGroup.setup("Contour");
   cvGroup.add(minArea.setup("Min area", 10, 1, 100));
   cvGroup.add(maxArea.setup("Max area", 200, 1, 500));
   cvGroup.add(threshold.setup("Threshold", 128, 0, 255));
-  
-  // Tracker properties.
-  
-	tracker.setPersistence(120);
-	tracker.setMaximumDistance(300);
-
-  // Add the groups to main GUI.
   gui.add(&cvGroup);
+  
+  // tracker GUI.
+  trackerGroup.setup("Tracker");
+  trackerGroup.add(persistence.setup("Persistence", 120, 30, 800));
+  trackerGroup.add(maxDistance.setup("Max Distance", 300, 100, 1200));
+  gui.add(&trackerGroup);
 
   // Restore the GUI from XML file.
   gui.loadFromFile("KinectInteractive.xml");
@@ -82,6 +82,10 @@ void ofApp::update(){
   contourFinder.setMaxAreaRadius(maxArea);
   contourFinder.setThreshold(threshold);
   
+  // Set Tracker properties.
+  tracker.setPersistence(persistence);
+  tracker.setMaximumDistance(maxDistance);
+  
   // Depth image matrix that we will pass to Contour finder.
   cv::Mat depthImgMat;
   
@@ -97,17 +101,9 @@ void ofApp::update(){
       texDepth.loadData(depthPixels);
       depthImgMat = ofxCv::toCv(depthPixels);
       
-      // Offset distances to center the polyline.
-      //widthOffset = ofGetWidth()/2 - depthPixels.getWidth()/2;
-      //heightOffset = ofGetHeight()/2 - depthPixels.getHeight()/2;
-      
       // Find contours.
       contourFinder.findContours(depthImgMat);
       tracker.track(contourFinder.getBoundingRects());
-      
-      // This is to center the polyline. Let's see if I need this. I should setup
-      // the video such that it takes the entire screen pretty much. Like full screen.
-      // updatePolyline(widthOffset, heightOffset);
     }
 
   #else
@@ -138,8 +134,36 @@ void ofApp::update(){
   // Update Audio player.
   audioPlayer.update();
   
-  // TODO: Enable this, when GUI is used.
-  //audioPlayer.updateSound(brightness);
+  // Process tracked objects = Map to sound. 
+  processTrackedObjects();
+}
+
+void ofApp::processTrackedObjects() {
+  // Current audio playback state.
+  State playbackState = audioPlayer.getPlaybackState();
+  
+  vector<TrackedRect>& followers = tracker.getFollowers();
+  // Somebody entered the room, play audio.
+  if (followers.size() > 0) {
+    if (playbackState != playing) {
+      audioPlayer.play();
+    }
+  } else {
+    // Nobody is in the room, stop the audio.
+    audioPlayer.stop();
+  }
+  
+  // Clear the poly and recreate it.
+  trackedPoly.clear();
+  for (int i = 0; i < followers.size(); i++) {
+    trackedPoly.addVertex(followers[i].getCenter());
+  }
+  trackedPoly.close();
+  
+  // Map this polyline's parameters to sound.
+  int perimeter = trackedPoly.getPerimeter();
+
+  audioPlayer.updateSound(perimeter);
 }
 
 // Set Z distance for the Tracked objects.
@@ -159,7 +183,7 @@ void ofApp::updateZDistances() {
       int brightness = depthPixels.getColor(center.x, center.y).getBrightness();
       
       // Map the distance in Z coordinate.
-      int z = ofMap (brightness, 255, 0, 300, -300, true);
+      int z = ofMap (brightness, 255, 0, 0, -300, true);
       followers[i].updateCenterWithZ(z);
     }
   }
@@ -167,28 +191,30 @@ void ofApp::updateZDistances() {
 
 //--------------------------------------------------------------
 void ofApp::draw(){
+  gui.draw();
+  
   cam.begin();
-  
-    ofScale(2, 2, 2);
-    
-    ofDrawAxis(10);
     texDepth.draw(0, 0);
-    
-    //contourFinder.draw();
-    
-    // Get the followers and draw them.
-    vector<TrackedRect>& followers = tracker.getFollowers();
-  
+    // Texture and Contour Finder.
+    ofDrawAxis(10);
+    ofPushMatrix();
+      ofScale(1, -1, 1);
+      int imageHeight = depthPixels.getHeight();
+      ofTranslate(0, -imageHeight, 0);
+      contourFinder.draw();
+    ofPopMatrix();
+
+    // Draw the followers.
     ofPushStyle();
-      ofPolyline p;
-      ofSetColor(ofColor::white);
+      vector<TrackedRect>& followers = tracker.getFollowers();
       for (int i = 0; i < followers.size(); i++) {
-        p.addVertex(followers[i].getCenter());
         followers[i].draw();
       }
-      p.close();
-      p.draw();
+      ofSetColor(ofColor::white);
+      trackedPoly.draw();
     ofPopStyle();
+  
+    ofDrawBitmapString(trackedPoly.getPerimeter(), 100, 100, 0);
     
   cam.end();
 }
@@ -213,8 +239,7 @@ void ofApp::keyPressed(int key) {
   
   // 4
   if (key == 52) {
-    bool pitchMode = audioPlayer.getPitchMode();
-    audioPlayer.setPitchMode(!pitchMode);
+    // Empty - Not mapped to anything currently. 
   }
   
   // --------------- VIDEO ----------------------
@@ -241,7 +266,7 @@ void ofApp::keyPressed(int key) {
   if (key == 55) {
     if (currentVidPlayer -> isPlaying()) {
       currentVidPlayer -> stop();
-      currentVidPlayer = &vidPlayer2;
+      currentVidPlayer = &vidPlayer3;
       currentVidPlayer -> play();
     }
   }
@@ -250,13 +275,22 @@ void ofApp::keyPressed(int key) {
   if (key == 56) {
     if (currentVidPlayer -> isPlaying()) {
       currentVidPlayer -> stop();
-      currentVidPlayer = &vidPlayer3;
+      currentVidPlayer = &vidPlayer4;
       currentVidPlayer -> play();
     }
   }
   
   // 9
   if (key == 57) {
+    if (currentVidPlayer -> isPlaying()) {
+      currentVidPlayer -> stop();
+      currentVidPlayer = &vidPlayer5;
+      currentVidPlayer -> play();
+    }
+  }
+  
+   // 0
+  if (key == 48) {
     if (currentVidPlayer -> isPlaying()) {
       currentVidPlayer -> setPaused(true);
     } else {
@@ -296,7 +330,7 @@ void ofApp::processOSCMessages() {
     
     if (m.getAddress() == "/3/toggle4") {
       int val = m.getArgAsInt(0);
-      audioPlayer.setPitchMode(val);
+      // Empty. Not mapped to anything.
     }
     
     if (m.getAddress() == "/3/xy") {
@@ -304,7 +338,7 @@ void ofApp::processOSCMessages() {
       float oscY = m.getArgAsFloat(1);
       
       mappedOsc.y = ofMap(oscY, 0, 1, -20.0f, 30.0f);
-      audioPlayer.setGain(mappedOsc.y);
+      audioPlayer.setSampleGain(mappedOsc.y);
     }
   }
 }

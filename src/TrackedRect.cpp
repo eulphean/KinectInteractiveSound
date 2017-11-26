@@ -17,6 +17,14 @@ void TrackedRect::setup(const cv::Rect& track) {
 	smooth = center;
 }
 
+void TrackedRect::updateCenterWithZ(int zDistance) {
+  center.z = zDistance;
+}
+
+glm::vec3 TrackedRect::getCenter() {
+  return center;
+}
+
 void TrackedRect::update(const cv::Rect& track) {
   // Only get X and Y coordinate from bounded rectangle.
 	ofVec2f c = toOf(track).getCenter();
@@ -35,33 +43,21 @@ void TrackedRect::kill() {
 	}
 }
 
-void TrackedRect::updateCenterWithZ(int zDistance) {
-  center.z = zDistance;
-}
-
-glm::vec3 TrackedRect::getCenter() {
-  return center;
-}
-
 void TrackedRect::draw() {
 	ofPushStyle();
     float size = 16;
-    ofSetColor(255);
   
+    // When the follower is dying, linearly reduce
+    // the size of sphere.
     if(startedDying) {
       ofSetColor(ofColor::red);
       size = ofMap(ofGetElapsedTimef() - startedDying, 0, dyingTime, size, 0, true);
     }
   
-    ofNoFill();
-  
     ofPushMatrix();
       ofTranslate(center);
-      ofDrawSphere(0, 0, 0, size);
       ofSetColor(color);
-      //all.draw();
-      ofSetColor(255);
-      //ofDrawBitmapString(ofToString(label), 0, 0, 0);
+      ofDrawSphere(glm::vec3(0, 0, 0), size);
     ofPopMatrix();
 	ofPopStyle();
 }
