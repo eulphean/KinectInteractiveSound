@@ -43,7 +43,7 @@ private:
   
     // Update sound constants.
     const int minPerimeter = 200;
-    const int maxPerimeter = 1000;
+    const int maxPerimeter = 500;
   
     // PDSP parameters.
     ofxPDSPEngine engine;

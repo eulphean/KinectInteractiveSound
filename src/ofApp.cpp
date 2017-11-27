@@ -194,25 +194,27 @@ void ofApp::draw(){
   gui.draw();
   
   cam.begin();
+    // Texture.
     texDepth.draw(0, 0);
-    // Texture and Contour Finder.
+    int imageHeight = depthPixels.getHeight();
+  
     ofDrawAxis(10);
     ofPushMatrix();
       ofScale(1, -1, 1);
-      int imageHeight = depthPixels.getHeight();
       ofTranslate(0, -imageHeight, 0);
+      // Contours.
       contourFinder.draw();
+      ofPushStyle();
+        vector<TrackedRect>& followers = tracker.getFollowers();
+        // Followers.
+        for (int i = 0; i < followers.size(); i++) {
+            followers[i].draw();
+        }
+        ofSetColor(ofColor::white);
+        // Poly between followers.
+        trackedPoly.draw();
+      ofPopStyle();
     ofPopMatrix();
-
-    // Draw the followers.
-    ofPushStyle();
-      vector<TrackedRect>& followers = tracker.getFollowers();
-      for (int i = 0; i < followers.size(); i++) {
-        followers[i].draw();
-      }
-      ofSetColor(ofColor::white);
-      trackedPoly.draw();
-    ofPopStyle();
   
     ofDrawBitmapString(trackedPoly.getPerimeter(), 100, 100, 0);
     

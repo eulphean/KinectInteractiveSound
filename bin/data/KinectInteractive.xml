@@ -6,9 +6,9 @@
 		<Threshold>14.3112</Threshold>
 	</ofxCv>
 	<Contour>
-		<Min_area>6.55612</Min_area>
+		<Min_area>40</Min_area>
 		<Max_area>120</Max_area>
-		<Threshold>11.7092</Threshold>
+		<Threshold>60</Threshold>
 	</Contour>
 	<Tracker>
 		<Persistence>120</Persistence>
