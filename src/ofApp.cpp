@@ -1,4 +1,5 @@
 #include "ofApp.h"
+#include "CameraParams.h"
 
 using namespace std;
 
@@ -179,7 +180,6 @@ void ofApp::updateZDistances() {
       ofVec2f center = followers[i].getCenter();
       
       // Brightness of the pixel at center.
-      int pixelIndex = center.x + center.y * depthPixels.getWidth();
       int brightness = depthPixels.getColor(center.x, center.y).getBrightness();
       
       // Map the distance in Z coordinate.
@@ -208,7 +208,7 @@ void ofApp::draw(){
         vector<TrackedRect>& followers = tracker.getFollowers();
         // Followers.
         for (int i = 0; i < followers.size(); i++) {
-            followers[i].draw();
+          followers[i].draw();
         }
         ofSetColor(ofColor::white);
         // Poly between followers.
@@ -217,8 +217,53 @@ void ofApp::draw(){
     ofPopMatrix();
   
     ofDrawBitmapString(trackedPoly.getPerimeter(), 100, 100, 0);
+  
+    if (showPointCloud) {
+      drawPointCloud();
+    }
     
   cam.end();
+}
+
+void ofApp::drawPointCloud() {
+  ofDrawAxis(10);
+  int w = depthPixels.getWidth();
+	int h = depthPixels.getHeight();
+	ofMesh mesh;
+	mesh.setMode(OF_PRIMITIVE_POINTS);
+	int step = 2;
+	for(int y = 0; y < h; y += step) {
+		for(int x = 0; x < w; x += step) {
+      int brightness = depthPixels.getColor(x, y).getBrightness();
+      
+      // Map the distance in Z coordinate.
+      int z = ofMap (brightness, 255, 0, 0, 4500, true);
+      if (brightness > 100) {
+        glm::vec3 vertex = depthToPointCloudPos(x, y, z);
+        mesh.addColor(brightness);
+        mesh.addVertex(vertex);
+      }
+		}
+	}
+  
+	glPointSize(1);
+	ofPushMatrix();
+	// the projected points are 'upside down' and 'backwards' 
+	ofScale(1, -1, -1);
+	//ofTranslate(0, 0, -1000); // center the points a bit
+	ofEnableDepthTest();
+	mesh.draw();
+	ofDisableDepthTest();
+	ofPopMatrix();
+}
+
+//calculte the xyz camera position based on the depth data
+glm::vec3 ofApp::depthToPointCloudPos(int x, int y, float depthValue) {
+  glm::vec3 point;
+  point.z = (depthValue);// / (1.0f); // Convert from mm to meters
+  point.x = (x - CameraParams::cx) * point.z / CameraParams::fx;
+  point.y = (y - CameraParams::cy) * point.z / CameraParams::fy;
+  return point;
 }
 
 void ofApp::keyPressed(int key) {
@@ -241,7 +286,8 @@ void ofApp::keyPressed(int key) {
   
   // 4
   if (key == 52) {
-    // Empty - Not mapped to anything currently. 
+    // Empty - Not mapped to anything currently.
+    showPointCloud = !showPointCloud;
   }
   
   // --------------- VIDEO ----------------------

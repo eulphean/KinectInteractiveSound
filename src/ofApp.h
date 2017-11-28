@@ -28,6 +28,8 @@ class ofApp : public ofBaseApp{
     void processOSCMessages();
     void updateZDistances();
     void processTrackedObjects();
+    glm::vec3 depthToPointCloudPos(int x, int y, float z);
+    void drawPointCloud();
   
     // Kinect parameters.
     ofxKinectV2 * kinect;
@@ -57,6 +59,8 @@ class ofApp : public ofBaseApp{
     ofxCv::RectTrackerFollower<TrackedRect> tracker;
   
     ofEasyCam cam;
+  
+    bool showPointCloud = false;
   
     #ifdef _USE_VIDEO
   

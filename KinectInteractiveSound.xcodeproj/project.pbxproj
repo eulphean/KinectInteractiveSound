@@ -1118,6 +1118,7 @@
 		F92EEC74EAC7FE3350BCC6B0 /* AAPeakEQ.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 4; name = AAPeakEQ.cpp; path = ../../../addons/ofxPDSP/src/modules/equalizers/AAPeakEQ.cpp; sourceTree = SOURCE_ROOT; };
 		F93B40601FC863C800F06DBE /* TrackedRect.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TrackedRect.cpp; sourceTree = "<group>"; };
 		F93B40611FC863C800F06DBE /* TrackedRect.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TrackedRect.h; sourceTree = "<group>"; };
+		F93FE18A1FCCF3A700D4266C /* CameraParams.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CameraParams.h; sourceTree = "<group>"; };
 		F9B07F7354284F7E5FA30CB8 /* ofRGBPacketProcessor.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 4; name = ofRGBPacketProcessor.cpp; path = ../../../addons/ofxKinectV2/libs/protonect/ofRGBPacketProcessor.cpp; sourceTree = SOURCE_ROOT; };
 		F9EC3DDC0E9F85C34B21C760 /* object_factory.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 4; name = object_factory.h; path = ../../../addons/ofxOpenCv/libs/opencv/include/opencv2/flann/object_factory.h; sourceTree = SOURCE_ROOT; };
 		F9FF3F3E9310959E06EC6679 /* Sequencer.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 4; name = Sequencer.h; path = ../../../addons/ofxPDSP/src/DSP/control/Sequencer.h; sourceTree = SOURCE_ROOT; };
@@ -2884,6 +2885,7 @@
 		E4B69E1C0A3A1BDC003C02F2 /* src */ = {
 			isa = PBXGroup;
 			children = (
+				F93FE18A1FCCF3A700D4266C /* CameraParams.h */,
 				F93B40601FC863C800F06DBE /* TrackedRect.cpp */,
 				F93B40611FC863C800F06DBE /* TrackedRect.h */,
 				E4B69E1D0A3A1BDC003C02F2 /* main.cpp */,
