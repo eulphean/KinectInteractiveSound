@@ -28,6 +28,8 @@ class ofApp : public ofBaseApp{
     void processOSCMessages();
     void updateZDistances();
     void processTrackedObjects();
+  
+    // Point Cloud.
     glm::vec3 depthToPointCloudPos(int x, int y, float z);
     void drawPointCloud();
   
@@ -35,6 +37,7 @@ class ofApp : public ofBaseApp{
     ofxKinectV2 * kinect;
     ofTexture texDepth;
     ofPixels depthPixels;
+    ofPixels rawDepthPixels;
   
     float avgX;
     float avgY;
@@ -60,6 +63,7 @@ class ofApp : public ofBaseApp{
   
     ofEasyCam cam;
   
+    // Turn on/off a point cloud.
     bool showPointCloud = false;
   
     #ifdef _USE_VIDEO

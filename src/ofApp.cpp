@@ -116,10 +116,12 @@ void ofApp::update(){
         // Do work here with the data obtained from Kinect.
         
         // Get depth pixels.
-        ofPixels pixels = kinect -> getDepthPixels();
+        depthPixels = kinect -> getDepthPixels();
+        rawDepthPixels = kinect -> getRawDepthPixels();
         
         // Create the depth texture from Kinect pixels.
-        texDepth.loadData(pixels);
+        texDepth.loadData(depthPixels);
+        
       }
     }
   
@@ -218,6 +220,7 @@ void ofApp::draw(){
   
     ofDrawBitmapString(trackedPoly.getPerimeter(), 100, 100, 0);
   
+    // Turn on/off point cloud.
     if (showPointCloud) {
       drawPointCloud();
     }
@@ -226,38 +229,37 @@ void ofApp::draw(){
 }
 
 void ofApp::drawPointCloud() {
-  ofDrawAxis(10);
   int w = depthPixels.getWidth();
 	int h = depthPixels.getHeight();
+  
 	ofMesh mesh;
 	mesh.setMode(OF_PRIMITIVE_POINTS);
 	int step = 2;
 	for(int y = 0; y < h; y += step) {
 		for(int x = 0; x < w; x += step) {
-      int brightness = depthPixels.getColor(x, y).getBrightness();
+      int pixelIndex = x + y * w;
       
-      // Map the distance in Z coordinate.
-      int z = ofMap (brightness, 255, 0, 0, 4500, true);
-      if (brightness > 100) {
-        glm::vec3 vertex = depthToPointCloudPos(x, y, z);
-        mesh.addColor(brightness);
-        mesh.addVertex(vertex);
-      }
+      // Use raw depth pixels to find the actual depth seen by the
+      // camera.
+      int depth = rawDepthPixels[pixelIndex];
+      glm::vec3 vertex = depthToPointCloudPos(x, y, depth);
+      mesh.addVertex(vertex);
 		}
 	}
   
+  // Size of the point.
 	glPointSize(1);
 	ofPushMatrix();
-	// the projected points are 'upside down' and 'backwards' 
-	ofScale(1, -1, -1);
-	//ofTranslate(0, 0, -1000); // center the points a bit
-	ofEnableDepthTest();
-	mesh.draw();
-	ofDisableDepthTest();
+    // Projected points are 'upside down' and 'backwards'
+    ofScale(1, -1, -1);
+    ofTranslate(0, -h, -h); // center the points a bit
+    ofEnableDepthTest();
+    mesh.draw();
+    ofDisableDepthTest();
 	ofPopMatrix();
 }
 
-//calculte the xyz camera position based on the depth data
+// Calculate the actual point based
 glm::vec3 ofApp::depthToPointCloudPos(int x, int y, float depthValue) {
   glm::vec3 point;
   point.z = (depthValue);// / (1.0f); // Convert from mm to meters
