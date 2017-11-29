@@ -37,7 +37,7 @@ class ofApp : public ofBaseApp{
     ofxKinectV2 * kinect;
     ofTexture texDepth;
     ofPixels depthPixels;
-    ofPixels rawDepthPixels;
+    ofFloatPixels rawDepthPixels;
   
     float avgX;
     float avgY;

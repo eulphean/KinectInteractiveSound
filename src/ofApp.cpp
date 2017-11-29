@@ -189,7 +189,7 @@ void ofApp::updateZDistances() {
       int brightness = depthPixels.getColor(center.x, center.y).getBrightness();
       
       // Map the distance in Z coordinate.
-      int z = ofMap (brightness, 255, 0, 0, -300, true);
+      int z = ofMap (brightness, 255, 0, 0, -1000, true);
       followers[i].updateCenterWithZ(z);
     }
   }
@@ -238,14 +238,14 @@ void ofApp::drawPointCloud() {
   
 	ofMesh mesh;
 	mesh.setMode(OF_PRIMITIVE_POINTS);
-	int step = 2;
+	int step = 1;
 	for(int y = 0; y < h; y += step) {
 		for(int x = 0; x < w; x += step) {
       int pixelIndex = x + y * w;
       
       // Use raw depth pixels to find the actual depth seen by the
       // camera.
-      int depth = rawDepthPixels[pixelIndex];
+      float depth = rawDepthPixels[pixelIndex];
       glm::vec3 vertex = depthToPointCloudPos(x, y, depth);
       mesh.addVertex(vertex);
 		}
