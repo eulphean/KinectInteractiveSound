@@ -201,30 +201,43 @@ void ofApp::draw(){
   
   cam.begin();
     // Texture.
-    texDepth.draw(0, 0);
+    if (showTexture) {
+        texDepth.draw(0, 0);
+    }
+    
     int imageHeight = depthPixels.getHeight();
-  
+
     ofDrawAxis(10);
+    
     ofPushMatrix();
+    
       ofScale(1, -1, 1);
       ofTranslate(0, -imageHeight, 0);
+    
       // Contours.
-      contourFinder.draw();
-      ofPushStyle();
+      if (showContours) {
+
+        contourFinder.draw();
+      }
+    
+      // Followers.
+      if (showFollowers) {
+       ofPushStyle();
         vector<TrackedRect>& followers = tracker.getFollowers();
-        // Followers.
         for (int i = 0; i < followers.size(); i++) {
           followers[i].draw();
         }
         ofSetColor(ofColor::white);
         // Poly between followers.
         trackedPoly.draw();
-      ofPopStyle();
+       ofPopStyle();
+      }
+    
     ofPopMatrix();
   
     ofDrawBitmapString(trackedPoly.getPerimeter(), 100, 100, 0);
   
-    // Turn on/off point cloud.
+    // Point cloud.
     if (showPointCloud) {
       drawPointCloud();
     }
@@ -256,7 +269,7 @@ void ofApp::drawPointCloud() {
 	ofPushMatrix();
     // Projected points are 'upside down' and 'backwards'
     ofScale(1, -1, -1);
-    ofTranslate(0, -h, -h); // center the points a bit
+    ofTranslate(0, 0, 0); // center the points a bit
     ofEnableDepthTest();
     mesh.draw();
     ofDisableDepthTest();
@@ -277,23 +290,26 @@ void ofApp::keyPressed(int key) {
 
   // 1
   if (key == 49) {
-    audioPlayer.play();
+    // Empty - Not mapped to anything currently.
+    showPointCloud = !showPointCloud;
   }
   
   // 2
   if (key == 50) {
-    audioPlayer.pause();
+    // Hide texture
+    showTexture = !showTexture;
   }
   
   // 3
   if (key == 51) {
-    audioPlayer.stop();
+    // Hide contours
+    showContours = !showContours;
   }
   
   // 4
   if (key == 52) {
-    // Empty - Not mapped to anything currently.
-    showPointCloud = !showPointCloud;
+    // Hide trackers
+    showFollowers = !showFollowers;
   }
   
   // --------------- VIDEO ----------------------

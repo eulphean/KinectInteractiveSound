@@ -65,6 +65,9 @@ class ofApp : public ofBaseApp{
   
     // Turn on/off a point cloud.
     bool showPointCloud = false;
+    bool showTexture = true;
+    bool showContours = true;
+    bool showFollowers = false;
   
       ofVideoPlayer vidPlayer1;
       ofVideoPlayer vidPlayer2;
