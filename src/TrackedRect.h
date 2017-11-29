@@ -21,7 +21,7 @@ class TrackedRect : public ofxCv::RectFollower {
   
   public:
   
-  // Constructor
+    // Constructor
 	TrackedRect()
 		:startedDying(0) {
 	}
@@ -30,9 +30,9 @@ class TrackedRect : public ofxCv::RectFollower {
 	void update(const cv::Rect& track);
 	void kill();
 	void draw();
-  void updateCenterWithZ(int zDistance);
-  glm::vec3 getCenter();
+    
+    // Update depth only when it's actively getting tracked.
+    void updateCenterWithZ(int zDistance);
   
-  // Update depth only when it's actively getting tracked.
-  void updateDepth(ofPixels *depthPixels);
+    glm::vec3 getCenter();
 };

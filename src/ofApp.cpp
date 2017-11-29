@@ -98,7 +98,7 @@ void ofApp::update(){
   
     // Video player related updates.
     if (currentVidPlayer -> isFrameNew()) {
-      blur((*currentVidPlayer), 10);
+      blur((*currentVidPlayer), blurVal);
       depthPixels = currentVidPlayer -> getPixels();
       texDepth.loadData(depthPixels);
       depthImgMat = ofxCv::toCv(depthPixels);
@@ -264,7 +264,7 @@ void ofApp::drawPointCloud() {
 		}
 	}
   
-  // Size of the point.
+    // Size of the point.
 	glPointSize(1);
 	ofPushMatrix();
     // Projected points are 'upside down' and 'backwards'
