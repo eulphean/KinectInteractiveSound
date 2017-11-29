@@ -73,7 +73,7 @@ void ofApp::setup(){
   gui.loadFromFile("KinectInteractive.xml");
 
   // "What do you desire" by Alan Watts sample to be played. 
-  audioPlayer.addSample("/Users/amaykataria/Documents/of_v20170714_osx_release/apps/Silo/KinectInteractiveSound/bin/data/1.wav");
+  audioPlayer.addSample("/Users/amay/Documents/of_v20170714_osx_release/apps/myApps/KinectInteractiveSound/bin/data/1.wav");
 }
 
 //--------------------------------------------------------------
