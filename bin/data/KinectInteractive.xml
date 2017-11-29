@@ -6,12 +6,18 @@
 		<Threshold>14.3112</Threshold>
 	</ofxCv>
 	<Contour>
-		<Min_area>40</Min_area>
+		<Min_area>39.8929</Min_area>
 		<Max_area>120</Max_area>
-		<Threshold>60</Threshold>
+		<Threshold>130.102</Threshold>
 	</Contour>
 	<Tracker>
-		<Persistence>120</Persistence>
+		<Persistence>30</Persistence>
 		<Max_Distance>273.98</Max_Distance>
 	</Tracker>
+	<Kinect>
+		<kinectV2_502087641942>
+			<minDistance>500</minDistance>
+			<maxDistance>10000</maxDistance>
+		</kinectV2_502087641942>
+	</Kinect>
 </group>

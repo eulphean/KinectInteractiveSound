@@ -12,7 +12,7 @@
 #define PORT 8000
 
 // Uncoment this if you don't want to use the test bench. 
-#define _USE_VIDEO
+// #define _USE_VIDEO
 
 class ofApp : public ofBaseApp{
 
@@ -55,7 +55,7 @@ class ofApp : public ofBaseApp{
     ofxGuiGroup kinectGroup;
     ofxGuiGroup cvGroup;
     ofxGuiGroup trackerGroup;
-    ofxFloatSlider minArea, maxArea, threshold, persistence, maxDistance;
+    ofxFloatSlider minArea, maxArea, threshold, persistence, maxDistance, blurVal;
   
     // Contour Finder.
     ofxCv::ContourFinder contourFinder;
@@ -66,8 +66,6 @@ class ofApp : public ofBaseApp{
     // Turn on/off a point cloud.
     bool showPointCloud = false;
   
-    #ifdef _USE_VIDEO
-  
       ofVideoPlayer vidPlayer1;
       ofVideoPlayer vidPlayer2;
       ofVideoPlayer vidPlayer3;
@@ -76,7 +74,6 @@ class ofApp : public ofBaseApp{
   
       ofVideoPlayer *currentVidPlayer;
   
-    #endif
   
     // Tracked polyline.
     ofPolyline trackedPoly;

@@ -60,6 +60,7 @@ void ofApp::setup(){
   cvGroup.add(minArea.setup("Min area", 10, 1, 100));
   cvGroup.add(maxArea.setup("Max area", 200, 1, 500));
   cvGroup.add(threshold.setup("Threshold", 128, 0, 255));
+  cvGroup.add(blurVal.setup("Blur", 10, 0, 20));
   gui.add(&cvGroup);
   
   // tracker GUI.
@@ -113,14 +114,17 @@ void ofApp::update(){
       // Update Kinect.
       kinect->update();
       if( kinect->isFrameNew()){
-        // Do work here with the data obtained from Kinect.
-        
         // Get depth pixels.
         depthPixels = kinect -> getDepthPixels();
+        blur(depthPixels, blurVal);
         rawDepthPixels = kinect -> getRawDepthPixels();
-        
         // Create the depth texture from Kinect pixels.
         texDepth.loadData(depthPixels);
+        depthImgMat = ofxCv::toCv(depthPixels);
+
+        // Find contours.
+        contourFinder.findContours(depthImgMat);
+        tracker.track(contourFinder.getBoundingRects());
         
       }
     }
