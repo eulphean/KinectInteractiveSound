@@ -251,7 +251,7 @@ void ofApp::drawPointCloud() {
   
 	ofMesh mesh;
 	mesh.setMode(OF_PRIMITIVE_POINTS);
-	int step = 1;
+	int step = 2;
 	for(int y = 0; y < h; y += step) {
 		for(int x = 0; x < w; x += step) {
       int pixelIndex = x + y * w;
