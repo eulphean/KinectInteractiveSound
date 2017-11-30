@@ -43,6 +43,14 @@ void TrackedRect::kill() {
 	}
 }
 
+void TrackedRect::setWorldCoordinate(glm::vec3 worldCoordinate) {
+  worldCoordinate = worldCoordinate;
+}
+
+glm::vec3 TrackedRect::getWorldCoordinate() {
+  return worldCoordinate;
+}
+
 void TrackedRect::draw() {
 	ofPushStyle();
     float size = 16;
@@ -55,7 +63,7 @@ void TrackedRect::draw() {
     }
   
     ofPushMatrix();
-      ofTranslate(center);
+      ofTranslate(worldCoordinate);
       ofSetColor(color);
       ofDrawSphere(glm::vec3(0, 0, 0), size);
     ofPopMatrix();

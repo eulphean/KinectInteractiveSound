@@ -65,7 +65,7 @@ void ofApp::setup(){
   
   // tracker GUI.
   trackerGroup.setup("Tracker");
-  trackerGroup.add(persistence.setup("Persistence", 120, 30, 800));
+  trackerGroup.add(persistence.setup("Persistence", 60, 0, 300));
   trackerGroup.add(maxDistance.setup("Max Distance", 300, 100, 1200));
   gui.add(&trackerGroup);
 
@@ -141,15 +141,28 @@ void ofApp::update(){
   // Update Audio player.
   audioPlayer.update();
   
-  // Process tracked objects = Map to sound. 
+  // Process tracked objects.
+  // Update their world coordinates for their center.
+  // Map the perimeter of their connections to sound.
   processTrackedObjects();
 }
 
 void ofApp::processTrackedObjects() {
+
+  vector<TrackedRect>& followers = tracker.getFollowers();
+  
+  // Update world coordinates for tracked bodies' center.
+  for (int i = 0; i < followers.size(); i++) {
+    auto center = followers[i].getCenter();
+    int pixelIndex = center.x + center.y * depthPixels.getWidth();
+    float depth = rawDepthPixels[pixelIndex];
+    glm::vec3 worldCoordinate = depthToPointCloudPos(center.x, center.y, depth);
+    followers[i].setWorldCoordinate(worldCoordinate);
+  }
+  
   // Current audio playback state.
   State playbackState = audioPlayer.getPlaybackState();
   
-  vector<TrackedRect>& followers = tracker.getFollowers();
   // Somebody entered the room, play audio.
   if (followers.size() > 0) {
     if (playbackState != playing) {
@@ -163,7 +176,7 @@ void ofApp::processTrackedObjects() {
   // Clear the poly and recreate it.
   trackedPoly.clear();
   for (int i = 0; i < followers.size(); i++) {
-    trackedPoly.addVertex(followers[i].getCenter());
+    trackedPoly.addVertex(followers[i].getWorldCoordinate());
   }
   trackedPoly.close();
   

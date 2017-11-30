@@ -15,6 +15,9 @@ class TrackedRect : public ofxCv::RectFollower {
     // Center of the bounding box.
     glm::vec3 center;
   
+    // Actual coordinate in real world,
+    glm::vec3 worldCoordinate;
+  
     // Z distance based on the brightness of the
     // tracked object.
     int zDistance;
@@ -31,8 +34,11 @@ class TrackedRect : public ofxCv::RectFollower {
 	void kill();
 	void draw();
     
-    // Update depth only when it's actively getting tracked.
-    void updateCenterWithZ(int zDistance);
+  // Update depth only when it's actively getting tracked.
+  void updateCenterWithZ(int zDistance);
+
+  glm::vec3 getCenter();
   
-    glm::vec3 getCenter();
+  void setWorldCoordinate(glm::vec3 worldCoordinate);
+  glm::vec3 getWorldCoordinate();
 };
