@@ -125,7 +125,6 @@ void ofApp::update(){
         // Find contours.
         contourFinder.findContours(depthImgMat);
         tracker.track(contourFinder.getBoundingRects());
-        
       }
     }
   
@@ -150,16 +149,7 @@ void ofApp::update(){
 void ofApp::processTrackedObjects() {
 
   vector<TrackedRect>& followers = tracker.getFollowers();
-  
-  // Update world coordinates for tracked bodies' center.
-  for (int i = 0; i < followers.size(); i++) {
-    auto center = followers[i].getCenter();
-    int pixelIndex = center.x + center.y * depthPixels.getWidth();
-    float depth = rawDepthPixels[pixelIndex];
-    glm::vec3 worldCoordinate = depthToPointCloudPos(center.x, center.y, depth);
-    followers[i].setWorldCoordinate(worldCoordinate);
-  }
-  
+
   // Current audio playback state.
   State playbackState = audioPlayer.getPlaybackState();
   
@@ -197,13 +187,16 @@ void ofApp::updateZDistances() {
     if (tracker.getLastSeen(label) == 0) {
       // Center of the bounding rectangle.
       ofVec2f center = followers[i].getCenter();
-      
-      // Brightness of the pixel at center.
-      int brightness = depthPixels.getColor(center.x, center.y).getBrightness();
-      
-      // Map the distance in Z coordinate.
-      int z = ofMap (brightness, 255, 0, 0, -1000, true);
-      followers[i].updateCenterWithZ(z);
+        
+      int pixelIndex = center.x + center.y * rawDepthPixels.getWidth();
+      float depth = rawDepthPixels[pixelIndex];
+        if (depth != 0) {
+          glm::vec3 worldCoordinate = depthToPointCloudPos(center.x, center.y, depth);
+            cout << "Center: " << ofToString(center) << " World: " << ofToString(worldCoordinate) << " Raw Depth : " << depth << endl;
+          if (worldCoordinate.x != 0 && worldCoordinate.y != 0 && worldCoordinate.z != 0) {
+             followers[i].setWorldCoordinate(worldCoordinate);
+          }
+        }
     }
   }
 }
@@ -234,7 +227,7 @@ void ofApp::draw(){
       }
     
       // Followers.
-      if (showFollowers) {
+      /*if (showFollowers) {
        ofPushStyle();
         vector<TrackedRect>& followers = tracker.getFollowers();
         for (int i = 0; i < followers.size(); i++) {
@@ -244,7 +237,7 @@ void ofApp::draw(){
         // Poly between followers.
         trackedPoly.draw();
        ofPopStyle();
-      }
+      }*/
     
     ofPopMatrix();
   
@@ -253,6 +246,22 @@ void ofApp::draw(){
     // Point cloud.
     if (showPointCloud) {
       drawPointCloud();
+    }
+    
+    if (showFollowers) {
+        ofPushMatrix();
+            ofScale(1, -1, -1);
+            ofTranslate(0, 0, 0);
+            ofPushStyle();
+                vector<TrackedRect>& followers = tracker.getFollowers();
+                for (int i = 0; i < followers.size(); i++) {
+                    followers[i].draw();
+                }
+                ofSetColor(ofColor::white);
+                // Poly between followers.
+                trackedPoly.draw();
+            ofPopStyle();
+        ofPopMatrix();
     }
     
   cam.end();

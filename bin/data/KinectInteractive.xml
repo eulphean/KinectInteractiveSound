@@ -9,10 +9,10 @@
 		<Min_area>25</Min_area>
 		<Max_area>80</Max_area>
 		<Threshold>160</Threshold>
-		<Blur>3</Blur>
+		<Blur>9.69388</Blur>
 	</Contour>
 	<Tracker>
-		<Persistence>60</Persistence>
+		<Persistence>0</Persistence>
 		<Max_Distance>300</Max_Distance>
 	</Tracker>
 	<Kinect>
