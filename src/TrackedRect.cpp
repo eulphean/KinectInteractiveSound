@@ -44,12 +44,7 @@ void TrackedRect::kill() {
 }
 
 void TrackedRect::setWorldCoordinate(glm::vec3 world) {
-    if (world.x != 0 && world.y != 0 && world.z != 0) {
-        worldCoordinate = glm::vec3(world.x, world.y, world.z);
-    } else {
-        worldCoordinate = worldCoordinate;
-        //Breakpoint.
-    }
+    worldCoordinate = glm::vec3(world.x, world.y, world.z);
 }
 
 glm::vec3 TrackedRect::getWorldCoordinate() {
@@ -71,7 +66,7 @@ void TrackedRect::draw() {
       ofTranslate(worldCoordinate);
       ofSetColor(color);
       ofDrawSphere(glm::vec3(0, 0, 0), size);
-     stringstream s;
+      stringstream s;
       s << "World : " << ofToString(worldCoordinate) << " Center: " << ofToString(center);
       ofDrawBitmapString(s.str(), glm::vec3(0, 0, 0));
     ofPopMatrix();

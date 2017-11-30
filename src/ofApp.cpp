@@ -166,7 +166,10 @@ void ofApp::processTrackedObjects() {
   // Clear the poly and recreate it.
   trackedPoly.clear();
   for (int i = 0; i < followers.size(); i++) {
-    trackedPoly.addVertex(followers[i].getWorldCoordinate());
+    glm::vec3 worldCoordinate = followers[i].getWorldCoordinate();
+    if (worldCoordinate != glm::vec3(0, 0, 0)) {
+      trackedPoly.addVertex(followers[i].getWorldCoordinate());
+    }
   }
   trackedPoly.close();
   
@@ -188,15 +191,13 @@ void ofApp::updateZDistances() {
       // Center of the bounding rectangle.
       ofVec2f center = followers[i].getCenter();
         
-      int pixelIndex = center.x + center.y * rawDepthPixels.getWidth();
+      int pixelIndex = center.x + center.y * depthPixels.getWidth();
       float depth = rawDepthPixels[pixelIndex];
-        if (depth != 0) {
-          glm::vec3 worldCoordinate = depthToPointCloudPos(center.x, center.y, depth);
-            cout << "Center: " << ofToString(center) << " World: " << ofToString(worldCoordinate) << " Raw Depth : " << depth << endl;
-          if (worldCoordinate.x != 0 && worldCoordinate.y != 0 && worldCoordinate.z != 0) {
-             followers[i].setWorldCoordinate(worldCoordinate);
-          }
-        }
+      if (depth > 0) {
+        glm::vec3 worldCoordinate = depthToPointCloudPos(center.x, center.y, depth);
+        cout << "Center: " << ofToString(center) << " World: " << ofToString(worldCoordinate) << " Raw Depth : " << depth << endl;
+           followers[i].setWorldCoordinate(worldCoordinate);
+      }
     }
   }
 }
@@ -225,20 +226,7 @@ void ofApp::draw(){
 
         contourFinder.draw();
       }
-    
-      // Followers.
-      /*if (showFollowers) {
-       ofPushStyle();
-        vector<TrackedRect>& followers = tracker.getFollowers();
-        for (int i = 0; i < followers.size(); i++) {
-          followers[i].draw();
-        }
-        ofSetColor(ofColor::white);
-        // Poly between followers.
-        trackedPoly.draw();
-       ofPopStyle();
-      }*/
-    
+  
     ofPopMatrix();
   
     ofDrawBitmapString(trackedPoly.getPerimeter(), 100, 100, 0);
@@ -255,7 +243,10 @@ void ofApp::draw(){
             ofPushStyle();
                 vector<TrackedRect>& followers = tracker.getFollowers();
                 for (int i = 0; i < followers.size(); i++) {
-                    followers[i].draw();
+                    glm::vec3 worldCoordinate = followers[i].getWorldCoordinate();
+                    if (worldCoordinate != glm::vec3(0, 0, 0)) {
+                      followers[i].draw();
+                    }
                 }
                 ofSetColor(ofColor::white);
                 // Poly between followers.
