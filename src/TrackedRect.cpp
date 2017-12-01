@@ -56,7 +56,7 @@ glm::vec3 TrackedRect::getWorldCoordinate() {
 
 void TrackedRect::draw() {
 	ofPushStyle();
-    float size = 30;
+    float size = 60;
   
     // When the follower is dying, linearly reduce
     // the size of sphere.

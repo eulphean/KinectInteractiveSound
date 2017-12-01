@@ -219,6 +219,8 @@ void ofApp::updateWorldCoordinates() {
 //--------------------------------------------------------------
 void ofApp::draw(){
   gui.draw();
+    
+  ofDrawBitmapString(trackedPoly.getPerimeter(), 10, 100);
   
   cam.begin();
     // Texture.
@@ -241,8 +243,6 @@ void ofApp::draw(){
       }
   
     ofPopMatrix();
-  
-    ofDrawBitmapString(trackedPoly.getPerimeter(), 0, -50, 0);
   
     // Point cloud.
     if (showPointCloud) {
