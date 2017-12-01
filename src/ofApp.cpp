@@ -68,6 +68,7 @@ void ofApp::setup(){
   trackerGroup.setup("Tracker");
   trackerGroup.add(persistence.setup("Persistence", 60, 0, 300));
   trackerGroup.add(maxDistance.setup("Max Distance", 300, 100, 1200));
+  trackerGroup.add(smoothingRate.setup("Smoothing Rate", 0.5f, 0, 5.0f));
   gui.add(&trackerGroup);
 
   // Restore the GUI from XML file.
@@ -79,7 +80,7 @@ void ofApp::setup(){
   // Camera settings.
 //    bRoll = bOrbit = false;
 //    angleH = roll = 0.0f;
-//    distance = 500.0f;
+//    distance = 500.0f
 }
 
 //--------------------------------------------------------------
@@ -89,6 +90,9 @@ void ofApp::update(){
   contourFinder.setMinAreaRadius(minArea);
   contourFinder.setMaxAreaRadius(maxArea);
   contourFinder.setThreshold(threshold);
+  
+  // Set a smoothing rate for the tracked rectangle.
+  contourFinder.getTracker().setSmoothingRate(smoothingRate);
   
   // Set Tracker properties.
   tracker.setPersistence(persistence);
@@ -124,6 +128,7 @@ void ofApp::update(){
         depthPixels = kinect -> getDepthPixels();
         blur(depthPixels, blurVal);
         rawDepthPixels = kinect -> getRawDepthPixels();
+        
         // Create the depth texture from Kinect pixels.
         texDepth.loadData(depthPixels);
         depthImgMat = ofxCv::toCv(depthPixels);
@@ -131,8 +136,8 @@ void ofApp::update(){
         // Find contours.
         contourFinder.findContours(depthImgMat);
         tracker.track(contourFinder.getBoundingRects());
-          // Update bounded rectangles' centers' world coordinate.
-          updateWorldCoordinates();
+        // Update bounded rectangles' centers' world coordinate.
+        updateWorldCoordinates();
       }
     }
   
@@ -232,7 +237,6 @@ void ofApp::draw(){
     
       // Contours.
       if (showContours) {
-
         contourFinder.draw();
       }
   
