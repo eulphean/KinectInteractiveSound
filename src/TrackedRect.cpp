@@ -53,7 +53,7 @@ glm::vec3 TrackedRect::getWorldCoordinate() {
 
 void TrackedRect::draw() {
 	ofPushStyle();
-    float size = 16;
+    float size = 30;
   
     // When the follower is dying, linearly reduce
     // the size of sphere.
@@ -64,11 +64,11 @@ void TrackedRect::draw() {
   
     ofPushMatrix();
       ofTranslate(worldCoordinate);
-      ofSetColor(color);
+        ofSetColor(color);
+    stringstream ss;
+    ss << "Center: " << ofToString(center) << ", World: " << ofToString(worldCoordinate);
+    ofDrawBitmapString(ss.str(), glm::vec3(0, 0, 0));
       ofDrawSphere(glm::vec3(0, 0, 0), size);
-      stringstream s;
-      s << "World : " << ofToString(worldCoordinate) << " Center: " << ofToString(center);
-      ofDrawBitmapString(s.str(), glm::vec3(0, 0, 0));
     ofPopMatrix();
 	ofPopStyle();
 }

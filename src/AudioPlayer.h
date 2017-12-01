@@ -42,8 +42,8 @@ private:
     int sampleIdx;
   
     // Update sound constants.
-    const int minPerimeter = 200;
-    const int maxPerimeter = 500;
+    const int minPerimeter = 3000;
+    const int maxPerimeter = 5000;
   
     // PDSP parameters.
     ofxPDSPEngine engine;

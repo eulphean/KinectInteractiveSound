@@ -8,7 +8,8 @@ using namespace cv;
 
 //--------------------------------------------------------------
 void ofApp::setup(){
-	ofSetVerticalSync(true);
+  ofSetVerticalSync(true);
+    //cout << "Target: " << cam.getTarget() << endl;
   ofBackground(ofColor::black);
   receive.setup(PORT);
   
@@ -74,6 +75,11 @@ void ofApp::setup(){
 
   // "What do you desire" by Alan Watts sample to be played. 
   audioPlayer.addSample("/Users/amay/Documents/of_v20170714_osx_release/apps/myApps/KinectInteractiveSound/bin/data/1.wav");
+    
+  // Camera settings.
+//    bRoll = bOrbit = false;
+//    angleH = roll = 0.0f;
+//    distance = 500.0f;
 }
 
 //--------------------------------------------------------------
@@ -125,14 +131,12 @@ void ofApp::update(){
         // Find contours.
         contourFinder.findContours(depthImgMat);
         tracker.track(contourFinder.getBoundingRects());
+          // Update bounded rectangles' centers' world coordinate.
+          updateWorldCoordinates();
       }
     }
   
   #endif
-  
-  // Update Z Distance of tracked objects based on the brightness
-  // of these objects.
-  updateZDistances();
   
   // Handle touch OSC messages. 
   processOSCMessages();
@@ -141,9 +145,13 @@ void ofApp::update(){
   audioPlayer.update();
   
   // Process tracked objects.
-  // Update their world coordinates for their center.
   // Map the perimeter of their connections to sound.
   processTrackedObjects();
+    
+//    if (bOrbit) angleH += 0.2f;
+//    if (bRoll) roll += 0.5f;
+//    cam.orbit(angleH, 0, distance);
+//    cam.roll(roll);
 }
 
 void ofApp::processTrackedObjects() {
@@ -167,6 +175,7 @@ void ofApp::processTrackedObjects() {
   trackedPoly.clear();
   for (int i = 0; i < followers.size(); i++) {
     glm::vec3 worldCoordinate = followers[i].getWorldCoordinate();
+    // Filter out vertices that might be 0, 0, 0.
     if (worldCoordinate != glm::vec3(0, 0, 0)) {
       trackedPoly.addVertex(followers[i].getWorldCoordinate());
     }
@@ -179,8 +188,8 @@ void ofApp::processTrackedObjects() {
   audioPlayer.updateSound(perimeter);
 }
 
-// Set Z distance for the Tracked objects.
-void ofApp::updateZDistances() {
+// Calculate world coordinates for tracked objects' center.
+void ofApp::updateWorldCoordinates() {
   vector <TrackedRect>& followers = tracker.getFollowers();
   for (int i = 0; i < followers.size(); i++) {
     int label = followers[i].getLabel();
@@ -236,6 +245,7 @@ void ofApp::draw(){
       drawPointCloud();
     }
     
+    // Followers
     if (showFollowers) {
         ofPushMatrix();
             ofScale(1, -1, -1);
@@ -244,9 +254,12 @@ void ofApp::draw(){
                 vector<TrackedRect>& followers = tracker.getFollowers();
                 for (int i = 0; i < followers.size(); i++) {
                     glm::vec3 worldCoordinate = followers[i].getWorldCoordinate();
+                    ofEnableDepthTest();
+                    // Filter out these followers popping up at 0, 0, 0
                     if (worldCoordinate != glm::vec3(0, 0, 0)) {
                       followers[i].draw();
                     }
+                    ofDisableDepthTest();
                 }
                 ofSetColor(ofColor::white);
                 // Poly between followers.
@@ -267,25 +280,25 @@ void ofApp::drawPointCloud() {
 	int step = 2;
 	for(int y = 0; y < h; y += step) {
 		for(int x = 0; x < w; x += step) {
-      int pixelIndex = x + y * w;
-      
-      // Use raw depth pixels to find the actual depth seen by the
-      // camera.
-      float depth = rawDepthPixels[pixelIndex];
-      glm::vec3 vertex = depthToPointCloudPos(x, y, depth);
-      mesh.addVertex(vertex);
+          int pixelIndex = x + y * w;
+          
+          // Use raw depth pixels to find the actual depth seen by the
+          // camera.
+          float depth = rawDepthPixels[pixelIndex];
+          glm::vec3 vertex = depthToPointCloudPos(x, y, depth);
+          mesh.addVertex(vertex);
 		}
 	}
   
     // Size of the point.
 	glPointSize(1);
 	ofPushMatrix();
-    // Projected points are 'upside down' and 'backwards'
-    ofScale(1, -1, -1);
-    ofTranslate(0, 0, 0); // center the points a bit
-    ofEnableDepthTest();
-    mesh.draw();
-    ofDisableDepthTest();
+        // Projected points are 'upside down' and 'backwards'
+        ofScale(1, -1, -1);
+        ofTranslate(0, 0, 0); // center the points a bit
+        ofEnableDepthTest();
+        mesh.draw();
+        ofDisableDepthTest();
 	ofPopMatrix();
 }
 
@@ -380,6 +393,20 @@ void ofApp::keyPressed(int key) {
       currentVidPlayer -> setPaused(false);
     }
   }
+    
+    if (key == 'h') {
+        bOrbit = !bOrbit;
+    }
+
+    if (key == 'r') {
+        bRoll = !bRoll;
+    }
+    if (key == OF_KEY_UP) {
+        distance = MIN((distance +=2.5f), 1000);
+    }
+    if (key == OF_KEY_DOWN) {
+        distance = MAX((distance -=2.5f), -150);
+    }
 }
 
 void ofApp::processOSCMessages() {
