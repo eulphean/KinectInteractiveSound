@@ -8,6 +8,8 @@ using namespace cv;
 const float dyingTime = 1;
 
 void TrackedRect::setup(const cv::Rect& track) {
+	kalman.init(1/10000., 1/10.); // inverse of (smoothness, rapidness)
+  
 	color.setHsb(ofRandom(0, 255), 255, 255);
   
   // Only get X and Y coordinate from bounded rectangle.
@@ -44,7 +46,8 @@ void TrackedRect::kill() {
 }
 
 void TrackedRect::setWorldCoordinate(glm::vec3 world) {
-    worldCoordinate = glm::vec3(world.x, world.y, world.z);
+    kalman.update(world);
+    worldCoordinate = kalman.getEstimation();
 }
 
 glm::vec3 TrackedRect::getWorldCoordinate() {

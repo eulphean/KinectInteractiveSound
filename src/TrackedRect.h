@@ -41,4 +41,7 @@ class TrackedRect : public ofxCv::RectFollower {
   
   void setWorldCoordinate(glm::vec3 worldCoordinate);
   glm::vec3 getWorldCoordinate();
+  
+  // Kalman tracking.
+  ofxCv::KalmanPosition kalman;
 };

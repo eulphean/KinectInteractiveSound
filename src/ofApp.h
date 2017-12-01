@@ -73,14 +73,13 @@ class ofApp : public ofBaseApp{
     bool showContours = true;
     bool showFollowers = false;
   
-      ofVideoPlayer vidPlayer1;
-      ofVideoPlayer vidPlayer2;
-      ofVideoPlayer vidPlayer3;
-      ofVideoPlayer vidPlayer4;
-      ofVideoPlayer vidPlayer5;
-  
-      ofVideoPlayer *currentVidPlayer;
-  
+    ofVideoPlayer vidPlayer1;
+    ofVideoPlayer vidPlayer2;
+    ofVideoPlayer vidPlayer3;
+    ofVideoPlayer vidPlayer4;
+    ofVideoPlayer vidPlayer5;
+
+    ofVideoPlayer *currentVidPlayer;
   
     // Tracked polyline.
     ofPolyline trackedPoly;
