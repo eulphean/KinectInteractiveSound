@@ -14,6 +14,7 @@
 	<Tracker>
 		<Persistence>30</Persistence>
 		<Max_Distance>299.579</Max_Distance>
+		<Smoothing_Rate>99.9107</Smoothing_Rate>
 	</Tracker>
 	<Kinect>
 		<kinectV2_502087641942>

@@ -68,7 +68,7 @@ void ofApp::setup(){
   trackerGroup.setup("Tracker");
   trackerGroup.add(persistence.setup("Persistence", 60, 0, 300));
   trackerGroup.add(maxDistance.setup("Max Distance", 300, 100, 1200));
-  trackerGroup.add(smoothingRate.setup("Smoothing Rate", 0.5f, 0, 5.0f));
+  trackerGroup.add(smoothingRate.setup("Smoothing Rate", 0.5f, 0, 100.0f));
   gui.add(&trackerGroup);
 
   // Restore the GUI from XML file.
@@ -242,7 +242,7 @@ void ofApp::draw(){
   
     ofPopMatrix();
   
-    ofDrawBitmapString(trackedPoly.getPerimeter(), 100, 100, 0);
+    ofDrawBitmapString(trackedPoly.getPerimeter(), 0, -50, 0);
   
     // Point cloud.
     if (showPointCloud) {
