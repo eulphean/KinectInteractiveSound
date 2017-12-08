@@ -62,10 +62,6 @@ class ofApp : public ofBaseApp{
     ofxCv::RectTrackerFollower<TrackedRect> tracker;
   
     ofEasyCam cam;
-    float angle;
-    bool bOrbit;
-    bool bRoll;
-    float angleH, roll, distance;
   
     // Turn on/off a point cloud.
     bool showPointCloud = false;

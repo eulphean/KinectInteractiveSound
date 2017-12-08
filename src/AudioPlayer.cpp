@@ -18,9 +18,6 @@ void AudioPlayer::patch() {
     sampleTrig >> sampler >> amp >> decimator >> engine.audio_out(0);
                              amp >> decimator >> engine.audio_out(1);
   
-    // Default noise level. TODO: Wrap it with an envelope.
-    killAmbientNoise();
-  
     // Don't need the GUI for now.
     /*osc_seek_ctrl >> sampler.in_start();
     
@@ -32,6 +29,9 @@ void AudioPlayer::patch() {
   
     // Defaut state of the system.
     sampleState = stopped;
+  
+    // Default state of the effects. 
+    effectState = 0;
 
     // Select the first sample by default.
     sampleIdx = 0;
@@ -59,23 +59,46 @@ void AudioPlayer::update() {
   }
 }
 
-void AudioPlayer::updateSound(float perimeter) {
-    // Calculate the new decimator frequency based on the brightness.
-    float newDecimatorFrequency = ofMap(perimeter, minPerimeter, maxPerimeter, 10000, 500, true);
-    newDecimatorFrequency >> decimator.in_freq();
+void AudioPlayer::updateSound(float perimeter, int objectCount) {
+    // Update effect state of the system.
+    updateEffectState(objectCount);
   
-    // Modify noise bit.
-    float noiseBit = ofMap(perimeter, minPerimeter, maxPerimeter, 1, 12, true);
-    noiseBit >> noise.in_bits();
-  
-    // Modify noise gain.
-    /*float noiseGain = ofMap(perimeter, minPerimeter, maxPerimeter, -45.0f, -10.0f, true);
-    noise * dB(noiseGain) >> engine.audio_out(0);
-    noise * dB(noiseGain) >> engine.audio_out(1);*/
+    switch (effectState) {
+      case 0: {
+        // Reset decimation.
+        10000 >> decimator.in_freq();
+        
+        // Change pitch.
+        float newPitch = ofMap(perimeter, minPerimeter, maxPerimeter, 0.0f, -10.0f, true);
+        newPitch >> sampler.in_pitch();
+        break;
+      }
+      
+      case 1: {
+        // Reset pitch.
+        0.0f >> sampler.in_pitch();
+        
+        // Calculate the new decimator frequency based on the brightness.
+        float newDecimatorFrequency = ofMap(perimeter, minPerimeter, maxPerimeter, 10000, 500, true);
+        newDecimatorFrequency >> decimator.in_freq();
+        break;
+      }
+      
+      case 2: {
+        
+      }
+      
+      default:
+        break;
+    }
 }
 
 float AudioPlayer::getMeterPosition() {
    return sampler.meter_position();
+}
+
+void AudioPlayer::updateEffectState(int objectCount) {
+  effectState = objectCount % totalEffects;
 }
 
 void AudioPlayer::drawGui() {
@@ -103,7 +126,6 @@ void AudioPlayer::pause(){
   if (sampleState == playing) {
     sampleState = paused;
     envGate.off();
-    killAmbientNoise();
   }
 }
 
@@ -111,7 +133,6 @@ void AudioPlayer::stop(){
   if (sampleState == playing) {
     sampleState = stopped;
     envGate.off();
-    killAmbientNoise();
   }
 }
 
@@ -121,12 +142,6 @@ State AudioPlayer::getPlaybackState() {
 
 void AudioPlayer::setSampleGain(float dbVal) {
   sampler * dB(dbVal) >> amp;
-}
-
-void AudioPlayer::killAmbientNoise() {
-  float noiseGain = -150;
-  noise * dB(noiseGain) >> engine.audio_out(0);
-  noise * dB(noiseGain) >> engine.audio_out(1);
 }
 
 /*

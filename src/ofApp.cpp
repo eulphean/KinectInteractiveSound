@@ -146,22 +146,17 @@ void ofApp::update(){
   // Handle touch OSC messages. 
   processOSCMessages();
   
-  // Update Audio player.
   audioPlayer.update();
   
   // Process tracked objects.
   // Map the perimeter of their connections to sound.
   processTrackedObjects();
-    
-//    if (bOrbit) angleH += 0.2f;
-//    if (bRoll) roll += 0.5f;
-//    cam.orbit(angleH, 0, distance);
-//    cam.roll(roll);
 }
 
 void ofApp::processTrackedObjects() {
 
   vector<TrackedRect>& followers = tracker.getFollowers();
+  int objectCount = followers.size();
 
   // Current audio playback state.
   State playbackState = audioPlayer.getPlaybackState();
@@ -190,7 +185,7 @@ void ofApp::processTrackedObjects() {
   // Map this polyline's parameters to sound.
   int perimeter = trackedPoly.getPerimeter();
 
-  audioPlayer.updateSound(perimeter);
+  audioPlayer.updateSound(perimeter, objectCount);
 }
 
 // Calculate world coordinates for tracked objects' center.
@@ -397,20 +392,6 @@ void ofApp::keyPressed(int key) {
       currentVidPlayer -> setPaused(false);
     }
   }
-    
-    if (key == 'h') {
-        bOrbit = !bOrbit;
-    }
-
-    if (key == 'r') {
-        bRoll = !bRoll;
-    }
-    if (key == OF_KEY_UP) {
-        distance = MIN((distance +=2.5f), 1000);
-    }
-    if (key == OF_KEY_DOWN) {
-        distance = MAX((distance -=2.5f), -150);
-    }
 }
 
 void ofApp::processOSCMessages() {

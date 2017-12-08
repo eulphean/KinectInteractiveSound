@@ -24,7 +24,7 @@ public:
     void addSample(string path);
   
     // Update sound effects based on human movement. 
-    void updateSound(float perimeter);
+    void updateSound(float perimeter, int objectCount);
   
     // Play, Pause, and Stop
     void play();
@@ -41,9 +41,16 @@ private:
     // Current sample
     int sampleIdx;
   
+    // 0 - Pitch, 1 - Delay, 2 - Decimation
+    // Cycle with each person.
+    int effectState;
+  
     // Update sound constants.
-    const int minPerimeter = 3000;
-    const int maxPerimeter = 5000;
+    const int minPerimeter = 2000;
+    const int maxPerimeter = 8000;
+    // Currently, we maintain 2 effects. Pitch and decimation.
+    // TODO: Also, add delay.
+    const int totalEffects = 2;
   
     // PDSP parameters.
     ofxPDSPEngine engine;
@@ -62,7 +69,7 @@ private:
   
     // Effects.
     pdsp::Decimator  decimator;
-    pdsp::BitNoise   noise;
+    pdsp::DampedDelay delay;
   
     // GUI
     ofxPanel gui;
@@ -72,7 +79,7 @@ private:
     // Get playhead position.
     float getMeterPosition();
   
-    void killAmbientNoise();
+    void updateEffectState(int objectCount);
   
     void patch();
 };   
