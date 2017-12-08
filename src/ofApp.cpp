@@ -236,9 +236,12 @@ void ofApp::draw(){
   
     ofPopMatrix();
   
-    // Point cloud.
+    // Point cloud. Translate and draw the point cloud at 0, 0, 0
     if (showPointCloud) {
-      drawPointCloud();
+      ofPushMatrix();
+        ofTranslate(glm::vec3(0, 0, 0));
+        drawPointCloud();
+      ofPopMatrix();
     }
     
     // Followers
