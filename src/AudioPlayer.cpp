@@ -65,26 +65,44 @@ void AudioPlayer::updateSound(float perimeter, int objectCount) {
   
     switch (effectState) {
       case -1: {
-          10000 >> decimator.in_freq();
+          // Reset delay.
+          20000 >> decimator.in_freq();
           0.0f >> sampler.in_pitch();
+          0.0f >> delay.in_time();
+          0.0f >> delay.in_feedback();
           break;
       }
             
-      case 0: {
+      case 2: {
+        if (objectCount >= 5) {
+            minPerimeter = 4500;
+            maxPerimeter = 10000;
+        } else {
+            // 2 people
+            minPerimeter = 2000;
+            maxPerimeter = 7000;
+        }
+          
         // Reset decimation.
-        10000 >> decimator.in_freq();
+        20000 >> decimator.in_freq();
         
         // Reset pitch.
         0.0f >> sampler.in_pitch();
         
-        float newDelayTime = ofMap(perimeter, minPerimeter, maxPerimeter, 0, 3000.0f, true);
-        float newFeedbackTime = ofMap(perimeter, minPerimeter, maxPerimeter, 0, 3.0f, true);
+        float newDelayTime = ofMap(perimeter, minPerimeter, maxPerimeter, 0, 1000.0f, true);
+        float newFeedbackTime = ofMap(perimeter, minPerimeter, maxPerimeter, 0, 1.0f, true);
         
         newDelayTime >> delay.in_time();
         newFeedbackTime >> delay.in_feedback();
+        break;
       }
       
       case 1: {
+        if (objectCount >= 4) {
+          minPerimeter = 3500;
+          maxPerimeter = 7500;
+        }
+          
         // Reset pitch.
         0.0f >> sampler.in_pitch();
         
@@ -93,21 +111,30 @@ void AudioPlayer::updateSound(float perimeter, int objectCount) {
         0.0f >> delay.in_feedback();
         
         // Calculate the new decimator frequency based on the brightness.
-        float newDecimatorFrequency = ofMap(perimeter, minPerimeter, maxPerimeter-500, 10000, 500, true);
+        float newDecimatorFrequency = ofMap(perimeter, minPerimeter, maxPerimeter, 20000, 500, true);
         newDecimatorFrequency >> decimator.in_freq();
         break;
       }
       
-      case 2: {
+      case 0: {
+        if (objectCount >= 6) {
+          minPerimeter = 5000;
+          maxPerimeter = 11000;
+        } else {
+          // 3 people
+          minPerimeter = 3000;
+          maxPerimeter = 10000;
+        }
+
         // Reset decimation.
-        10000 >> decimator.in_freq();
+        20000 >> decimator.in_freq();
         
         // Reset delay.
         0.0f >> delay.in_time();
         0.0f >> delay.in_feedback();
         
         // Change pitch, opposite of the pattern of decimation frequency.
-        float newPitch = ofMap(perimeter, minPerimeter, maxPerimeter, -6.0f, 0.0f, true);
+        float newPitch = ofMap(perimeter, minPerimeter, maxPerimeter, -10.0f, 5.0f, true);
         newPitch >> sampler.in_pitch();
         break;
       }
@@ -122,7 +149,7 @@ float AudioPlayer::getMeterPosition() {
 }
 
 void AudioPlayer::updateEffectState(int objectCount) {
-    if (objectCount == 0) {
+    if (objectCount == 0 || objectCount == 1) {
         effectState = -1;
     } else {
         effectState = objectCount % totalEffects;
