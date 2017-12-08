@@ -220,7 +220,7 @@ void ofApp::updateWorldCoordinates() {
 void ofApp::draw(){
   gui.draw();
     
-  ofDrawBitmapString(trackedPoly.getPerimeter(), 10, 100);
+  ofDrawBitmapString(trackedPoly.getPerimeter(), 10, 500);
   
   cam.begin();
     // Texture.
