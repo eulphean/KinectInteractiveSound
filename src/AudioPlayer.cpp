@@ -64,12 +64,18 @@ void AudioPlayer::updateSound(float perimeter, int objectCount) {
     updateEffectState(objectCount);
   
     switch (effectState) {
+      case -1: {
+          10000 >> decimator.in_freq();
+          0.0f >> sampler.in_pitch();
+          break;
+      }
+            
       case 0: {
         // Reset decimation.
         10000 >> decimator.in_freq();
         
         // Change pitch, opposite of the pattern of decimation frequency.
-        float newPitch = ofMap(perimeter, minPerimeter, maxPerimeter, -8.0f, 0.0f, true);
+        float newPitch = ofMap(perimeter, minPerimeter, maxPerimeter, -6.0f, 0.0f, true);
         newPitch >> sampler.in_pitch();
         break;
       }
@@ -79,7 +85,7 @@ void AudioPlayer::updateSound(float perimeter, int objectCount) {
         0.0f >> sampler.in_pitch();
         
         // Calculate the new decimator frequency based on the brightness.
-        float newDecimatorFrequency = ofMap(perimeter, minPerimeter, maxPerimeter, 10000, 500, true);
+        float newDecimatorFrequency = ofMap(perimeter, minPerimeter, maxPerimeter-500, 10000, 500, true);
         newDecimatorFrequency >> decimator.in_freq();
         break;
       }
@@ -98,7 +104,11 @@ float AudioPlayer::getMeterPosition() {
 }
 
 void AudioPlayer::updateEffectState(int objectCount) {
-  effectState = objectCount % totalEffects;
+    if (objectCount == 0) {
+        effectState = -1;
+    } else {
+        effectState = objectCount % totalEffects;
+    }
 }
 
 void AudioPlayer::drawGui() {

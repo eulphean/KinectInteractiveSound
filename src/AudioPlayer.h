@@ -47,7 +47,7 @@ private:
   
     // Update sound constants.
     const int minPerimeter = 2000;
-    const int maxPerimeter = 8000;
+    const int maxPerimeter = 7000;
     // Currently, we maintain 2 effects. Pitch and decimation.
     // TODO: Also, add delay.
     const int totalEffects = 2;

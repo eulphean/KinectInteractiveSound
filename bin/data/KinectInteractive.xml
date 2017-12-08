@@ -12,7 +12,7 @@
 		<Blur>4</Blur>
 	</Contour>
 	<Tracker>
-		<Persistence>30</Persistence>
+		<Persistence>59.6939</Persistence>
 		<Max_Distance>299.579</Max_Distance>
 		<Smoothing_Rate>5</Smoothing_Rate>
 	</Tracker>
