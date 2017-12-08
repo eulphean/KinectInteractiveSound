@@ -15,8 +15,8 @@ void AudioPlayer::patch() {
     decimator.set(20000);
   
     // Route the sampler to the output.
-    sampleTrig >> sampler >> amp >> decimator >> engine.audio_out(0);
-                             amp >> decimator >> engine.audio_out(1);
+    sampleTrig >> sampler >> amp >> delay >> decimator >> engine.audio_out(0);
+                             amp >> delay >> decimator >> engine.audio_out(1);
   
     // Don't need the GUI for now.
     /*osc_seek_ctrl >> sampler.in_start();
@@ -74,15 +74,23 @@ void AudioPlayer::updateSound(float perimeter, int objectCount) {
         // Reset decimation.
         10000 >> decimator.in_freq();
         
-        // Change pitch, opposite of the pattern of decimation frequency.
-        float newPitch = ofMap(perimeter, minPerimeter, maxPerimeter, -6.0f, 0.0f, true);
-        newPitch >> sampler.in_pitch();
-        break;
+        // Reset pitch.
+        0.0f >> sampler.in_pitch();
+        
+        float newDelayTime = ofMap(perimeter, minPerimeter, maxPerimeter, 0, 3000.0f, true);
+        float newFeedbackTime = ofMap(perimeter, minPerimeter, maxPerimeter, 0, 3.0f, true);
+        
+        newDelayTime >> delay.in_time();
+        newFeedbackTime >> delay.in_feedback();
       }
       
       case 1: {
         // Reset pitch.
         0.0f >> sampler.in_pitch();
+        
+        // Reset delay.
+        0.0f >> delay.in_time();
+        0.0f >> delay.in_feedback();
         
         // Calculate the new decimator frequency based on the brightness.
         float newDecimatorFrequency = ofMap(perimeter, minPerimeter, maxPerimeter-500, 10000, 500, true);
@@ -91,7 +99,17 @@ void AudioPlayer::updateSound(float perimeter, int objectCount) {
       }
       
       case 2: {
+        // Reset decimation.
+        10000 >> decimator.in_freq();
         
+        // Reset delay.
+        0.0f >> delay.in_time();
+        0.0f >> delay.in_feedback();
+        
+        // Change pitch, opposite of the pattern of decimation frequency.
+        float newPitch = ofMap(perimeter, minPerimeter, maxPerimeter, -6.0f, 0.0f, true);
+        newPitch >> sampler.in_pitch();
+        break;
       }
       
       default:

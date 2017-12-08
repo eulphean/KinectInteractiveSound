@@ -50,7 +50,7 @@ private:
     const int maxPerimeter = 7000;
     // Currently, we maintain 2 effects. Pitch and decimation.
     // TODO: Also, add delay.
-    const int totalEffects = 2;
+    const int totalEffects = 3;
   
     // PDSP parameters.
     ofxPDSPEngine engine;
