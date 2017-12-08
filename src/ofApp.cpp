@@ -15,6 +15,9 @@ void ofApp::setup(){
   
   // Load GUI from a pre-saved XML file.
   gui.setup();
+    
+    cam.setNearClip(15.0f);
+    cam.setFarClip(12000.0f);
 
   #ifdef _USE_VIDEO
   
@@ -222,7 +225,7 @@ void ofApp::draw(){
     
     int imageHeight = depthPixels.getHeight();
 
-    ofDrawAxis(10);
+    //ofDrawAxis(10);
     
     ofPushMatrix();
     
@@ -236,36 +239,38 @@ void ofApp::draw(){
   
     ofPopMatrix();
   
-    // Point cloud. Translate and draw the point cloud at 0, 0, 0
-    if (showPointCloud) {
-      ofPushMatrix();
-        ofTranslate(glm::vec3(0, 0, 0));
-        drawPointCloud();
-      ofPopMatrix();
-    }
-    
-    // Followers
-    if (showFollowers) {
-        ofPushMatrix();
-            ofScale(1, -1, -1);
-            ofTranslate(0, 0, 0);
-            ofPushStyle();
-                vector<TrackedRect>& followers = tracker.getFollowers();
-                for (int i = 0; i < followers.size(); i++) {
-                    glm::vec3 worldCoordinate = followers[i].getWorldCoordinate();
-                    ofEnableDepthTest();
-                    // Filter out these followers popping up at 0, 0, 0
-                    if (worldCoordinate != glm::vec3(0, 0, 0)) {
-                      followers[i].draw();
+    ofPushMatrix();
+        ofTranslate(glm::vec3(0, 0, 300));
+        ofScale(3, 3, 2);
+        // Point cloud. Translate and draw the point cloud at 0, 0, 0
+        if (showPointCloud) {
+            drawPointCloud();
+        }
+        
+        // Followers
+        if (showFollowers) {
+            ofPushMatrix();
+                ofScale(1, -1, -1);
+                ofTranslate(0, 0, 0);
+                ofPushStyle();
+                    ofSetLineWidth(3.0f);
+                    ofSetColor(ofColor::white);
+                    // Poly between followers.
+                    trackedPoly.draw();
+                    vector<TrackedRect>& followers = tracker.getFollowers();
+                    for (int i = 0; i < followers.size(); i++) {
+                        glm::vec3 worldCoordinate = followers[i].getWorldCoordinate();
+                        ofEnableDepthTest();
+                        // Filter out these followers popping up at 0, 0, 0
+                        if (worldCoordinate != glm::vec3(0, 0, 0)) {
+                          followers[i].draw();
+                        }
+                        ofDisableDepthTest();
                     }
-                    ofDisableDepthTest();
-                }
-                ofSetColor(ofColor::white);
-                // Poly between followers.
-                trackedPoly.draw();
-            ofPopStyle();
-        ofPopMatrix();
-    }
+                ofPopStyle();
+            ofPopMatrix();
+        }
+    ofPopMatrix();
     
   cam.end();
 }
