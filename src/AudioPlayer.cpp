@@ -39,7 +39,7 @@ void AudioPlayer::patch() {
 
     //------------SETUPS AND START AUDIO-------------
     engine.listDevices();
-    engine.setDeviceID(1); // REMEMBER TO SET THIS AT THE RIGHT INDEX!!!!
+    engine.setDeviceID(0); // REMEMBER TO SET THIS AT THE RIGHT INDEX!!!!
     engine.setup(44100, 512, 2);
 }
 
