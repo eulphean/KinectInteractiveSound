@@ -68,8 +68,8 @@ void AudioPlayer::updateSound(float perimeter, int objectCount) {
         // Reset decimation.
         10000 >> decimator.in_freq();
         
-        // Change pitch.
-        float newPitch = ofMap(perimeter, minPerimeter, maxPerimeter, 0.0f, -10.0f, true);
+        // Change pitch, opposite of the pattern of decimation frequency.
+        float newPitch = ofMap(perimeter, minPerimeter, maxPerimeter, -8.0f, 0.0f, true);
         newPitch >> sampler.in_pitch();
         break;
       }
