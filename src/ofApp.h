@@ -65,8 +65,8 @@ class ofApp : public ofBaseApp{
   
     // Turn on/off a point cloud.
     bool showPointCloud = false;
-    bool showTexture = true;
-    bool showContours = true;
+    bool showTexture = false;
+    bool showContours = false;
     bool showFollowers = false;
   
     ofVideoPlayer vidPlayer1;
@@ -79,5 +79,7 @@ class ofApp : public ofBaseApp{
   
     // Tracked polyline.
     ofPolyline trackedPoly;
+  
+    bool hideGui = false;
 };
 

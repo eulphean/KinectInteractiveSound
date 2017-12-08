@@ -69,8 +69,6 @@ void TrackedRect::draw() {
       ofTranslate(worldCoordinate);
         ofSetColor(color);
     stringstream ss;
-    ss << "Center: " << ofToString(center) << ", World: " << ofToString(worldCoordinate);
-    ofDrawBitmapString(ss.str(), glm::vec3(0, 0, 0));
       ofDrawSphere(glm::vec3(0, 0, 0), size);
     ofPopMatrix();
 	ofPopStyle();

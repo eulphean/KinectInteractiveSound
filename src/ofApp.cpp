@@ -76,11 +76,6 @@ void ofApp::setup(){
 
   // "What do you desire" by Alan Watts sample to be played. 
   audioPlayer.addSample("/Users/amay/Documents/of_v20170714_osx_release/apps/myApps/KinectInteractiveSound/bin/data/1.wav");
-    
-  // Camera settings.
-//    bRoll = bOrbit = false;
-//    angleH = roll = 0.0f;
-//    distance = 500.0f
 }
 
 //--------------------------------------------------------------
@@ -213,7 +208,9 @@ void ofApp::updateWorldCoordinates() {
 
 //--------------------------------------------------------------
 void ofApp::draw(){
-  gui.draw();
+  if (hideGui) {
+    gui.draw();
+  }
     
   ofDrawBitmapString(trackedPoly.getPerimeter(), 10, 500);
   
@@ -311,8 +308,6 @@ glm::vec3 ofApp::depthToPointCloudPos(int x, int y, float depthValue) {
 }
 
 void ofApp::keyPressed(int key) {
-  // --------------- AUDIO ----------------------
-
   // 1
   if (key == 49) {
     // Empty - Not mapped to anything currently.
@@ -337,60 +332,9 @@ void ofApp::keyPressed(int key) {
     showFollowers = !showFollowers;
   }
   
-  // --------------- VIDEO ----------------------
-  
   // 5
   if (key == 53) {
-    if (currentVidPlayer -> isPlaying()) {
-      currentVidPlayer -> stop();
-      currentVidPlayer = &vidPlayer1;
-      currentVidPlayer -> play();
-    }
-  }
-  
-  // 6
-  if (key == 54) {
-    if (currentVidPlayer -> isPlaying()) {
-      currentVidPlayer -> stop();
-      currentVidPlayer = &vidPlayer2;
-      currentVidPlayer -> play();
-    }
-  }
-  
-  // 7
-  if (key == 55) {
-    if (currentVidPlayer -> isPlaying()) {
-      currentVidPlayer -> stop();
-      currentVidPlayer = &vidPlayer3;
-      currentVidPlayer -> play();
-    }
-  }
-  
-  // 8
-  if (key == 56) {
-    if (currentVidPlayer -> isPlaying()) {
-      currentVidPlayer -> stop();
-      currentVidPlayer = &vidPlayer4;
-      currentVidPlayer -> play();
-    }
-  }
-  
-  // 9
-  if (key == 57) {
-    if (currentVidPlayer -> isPlaying()) {
-      currentVidPlayer -> stop();
-      currentVidPlayer = &vidPlayer5;
-      currentVidPlayer -> play();
-    }
-  }
-  
-   // 0
-  if (key == 48) {
-    if (currentVidPlayer -> isPlaying()) {
-      currentVidPlayer -> setPaused(true);
-    } else {
-      currentVidPlayer -> setPaused(false);
-    }
+    hideGui = !hideGui;
   }
 }
 
@@ -403,37 +347,19 @@ void ofApp::processOSCMessages() {
     receive.getNextMessage(&m);
     
     if (m.getAddress() == "/3/toggle1") {
-      int val = m.getArgAsInt(0);
-      if (val) {
-        audioPlayer.play();
-      }
+      showFollowers = !showFollowers;
     }
     
     if (m.getAddress() == "/3/toggle2") {
-      int val = m.getArgAsInt(0);
-      if (val) {
-        audioPlayer.pause();
-      }
+      showPointCloud = !showPointCloud;
     }
     
     if (m.getAddress() == "/3/toggle3") {
-      int val = m.getArgAsInt(0);
-      if (val) {
-        audioPlayer.stop();
-      }
+      showTexture = !showTexture;
     }
     
     if (m.getAddress() == "/3/toggle4") {
-      int val = m.getArgAsInt(0);
-      // Empty. Not mapped to anything.
-    }
-    
-    if (m.getAddress() == "/3/xy") {
-      float oscX = m.getArgAsFloat(0);
-      float oscY = m.getArgAsFloat(1);
-      
-      mappedOsc.y = ofMap(oscY, 0, 1, -20.0f, 30.0f);
-      audioPlayer.setSampleGain(mappedOsc.y);
+      showContours = !showContours;
     }
   }
 }
