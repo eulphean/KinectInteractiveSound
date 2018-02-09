@@ -18,8 +18,8 @@
 	</Tracker>
 	<Kinect>
 		<kinectV2_502087641942>
-			<minDistance>500</minDistance>
-			<maxDistance>10000</maxDistance>
+			<minDistance>2503.96</minDistance>
+			<maxDistance>4128.28</maxDistance>
 		</kinectV2_502087641942>
 	</Kinect>
 </group>
